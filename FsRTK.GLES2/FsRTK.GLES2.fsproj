@@ -8,7 +8,7 @@
     <ProjectGuid>80078867-21ea-468d-a53c-f3798f145c94</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>FsRTK.GLES2</RootNamespace>
-    <AssemblyName>FsRTK.GLES2</AssemblyName>
+    <AssemblyName>FsRTK.Gles2</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <TargetFSharpCoreVersion>4.4.0.0</TargetFSharpCoreVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

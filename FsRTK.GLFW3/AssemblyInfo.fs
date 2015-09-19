@@ -1,4 +1,4 @@
-﻿namespace FsRTK.GLFW3.AssemblyInfo
+﻿namespace FsRTK.Glfw3.AssemblyInfo
 
 open System.Reflection
 open System.Runtime.CompilerServices
