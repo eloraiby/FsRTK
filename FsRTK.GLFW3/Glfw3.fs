@@ -15,7 +15,7 @@
 ** You should have received a copy of the GNU Affero General Public License
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *)
-module FsRTK.GLFW3
+module FsRTK.Glfw3
 
 open System
 open System.Runtime.InteropServices

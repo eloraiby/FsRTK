@@ -1,4 +1,4 @@
-﻿namespace FsRTK.GLFW3.AssemblyInfo
+﻿namespace TestGlfw3Gles2.AssemblyInfo
 
 open System.Reflection
 open System.Runtime.CompilerServices
@@ -7,11 +7,11 @@ open System.Runtime.InteropServices
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[<assembly: AssemblyTitle("FsRTK.GLFW3")>]
+[<assembly: AssemblyTitle("TestGlfw3Gles2")>]
 [<assembly: AssemblyDescription("")>]
 [<assembly: AssemblyConfiguration("")>]
 [<assembly: AssemblyCompany("")>]
-[<assembly: AssemblyProduct("FsRTK.GLFW3")>]
+[<assembly: AssemblyProduct("TestGlfw3Gles2")>]
 [<assembly: AssemblyCopyright("Copyright ©  2015")>]
 [<assembly: AssemblyTrademark("")>]
 [<assembly: AssemblyCulture("")>]
@@ -22,7 +22,7 @@ open System.Runtime.InteropServices
 [<assembly: ComVisible(false)>]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[<assembly: Guid("51f3e984-e964-452a-b9b3-7a8a43df78a0")>]
+[<assembly: Guid("85662a7e-3662-4942-952e-cd76a2c814d6")>]
 
 // Version information for an assembly consists of the following four values:
 // 

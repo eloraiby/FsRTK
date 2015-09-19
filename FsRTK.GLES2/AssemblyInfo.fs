@@ -1,4 +1,4 @@
-﻿namespace FsRTK.Gles2.AssemblyInfo
+﻿namespace FsRTK.GLES2.AssemblyInfo
 
 open System.Reflection
 open System.Runtime.CompilerServices
