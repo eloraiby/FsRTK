@@ -346,434 +346,434 @@ module private Native =
     
     type GLubyte = byte
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glActiveTexture(GLenum texture)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glAttachShader(int32 program, int32 shader)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glBindAttribLocation(int32 program, int32 index, [<MarshalAs(UnmanagedType.LPStr)>] string name)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glBindBuffer(GLenum target, int32 buffer)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glBindFramebuffer(GLenum target, int32 framebuffer)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glBindRenderbuffer(GLenum target, int32 renderbuffer)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glBindTexture(GLenum target, int32 texture)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glBlendColor(single red, single green, single blue, single alpha)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glBlendEquation(GLenum mode)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glBlendEquationSeparate(GLenum modeRGB, GLenum modeAlpha)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glBlendFunc(GLenum sfactor, GLenum dfactor)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glBlendFuncSeparate(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glBufferData(GLenum target, int32 size, void * data, GLenum usage)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glBufferSubData(GLenum target, int32 offset, int32 size, void * data)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern GLenum emu_glCheckFramebufferStatus(GLenum target)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glClear(int32 mask)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glClearColor(single red, single green, single blue, single alpha)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glClearDepthf(single d)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glClearStencil(int32 s)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glColorMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glCompileShader(int32 shader)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glCompressedTexImage2D(GLenum target, int32 level, GLenum internalformat, int32 width, int32 height, int32 border, int32 imageSize, void * data)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glCompressedTexSubImage2D(GLenum target, int32 level, int32 xoffset, int32 yoffset, int32 width, int32 height, GLenum format, int32 imageSize, void * data)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glCopyTexImage2D(GLenum target, int32 level, GLenum internalformat, int32 x, int32 y, int32 width, int32 height, int32 border)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glCopyTexSubImage2D(GLenum target, int32 level, int32 xoffset, int32 yoffset, int32 x, int32 y, int32 width, int32 height)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern int32 emu_glCreateProgram()
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern int32 emu_glCreateShader(GLenum type_)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glCullFace(GLenum mode)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glDeleteBuffers(int32 n, [<MarshalAs(UnmanagedType.LPArray)>] int32[] buffers)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glDeleteFramebuffers(int32 n, [<MarshalAs(UnmanagedType.LPArray)>] int32[] framebuffers)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glDeleteProgram(int32 program)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glDeleteRenderbuffers(int32 n, [<MarshalAs(UnmanagedType.LPArray)>] int32[] renderbuffers)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glDeleteShader(int32 shader)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glDeleteTextures(int32 n, [<MarshalAs(UnmanagedType.LPArray)>] int32[] textures)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glDepthFunc(GLenum func)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glDepthMask(GLboolean flag)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glDepthRangef(single n, single f)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glDetachShader(int32 program, int32 shader)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glDisable(GLenum cap)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glDisableVertexAttribArray(int32 index)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glDrawArrays(GLenum mode, int32 first, int32 count)
     
-    [<DllImport(DllName, EntryPoint = "emu_glDrawElements", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, EntryPoint = "emu_glDrawElements", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glDrawElementsU16(GLenum mode, int32 count, GLenum type_, [<MarshalAs(UnmanagedType.LPArray)>] uint16[] indices)
 
-    [<DllImport(DllName, EntryPoint = "emu_glDrawElements", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, EntryPoint = "emu_glDrawElements", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glDrawElementsU32(GLenum mode, int32 count, GLenum type_, [<MarshalAs(UnmanagedType.LPArray)>] uint32[] indices)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glEnable(GLenum cap)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glEnableVertexAttribArray(int32 index)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glFinish()
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glFlush()
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glFramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, int32 renderbuffer)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glFramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, int32 texture, int32 level)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glFrontFace(GLenum mode)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glGenBuffers(int32 n, [<MarshalAs(UnmanagedType.LPArray)>] int32[] buffers)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glGenerateMipmap(GLenum target)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glGenFramebuffers(int32 n, [<MarshalAs(UnmanagedType.LPArray)>] int32[] framebuffers)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glGenRenderbuffers(int32 n, [<MarshalAs(UnmanagedType.LPArray)>] int32[] renderbuffers)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glGenTextures(int32 n, [<MarshalAs(UnmanagedType.LPArray)>] int32[] textures)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glGetActiveAttrib(int32 program, int32 index, int32 bufSize, [<Out>] int32& length, [<Out>] int32& size, [<Out>] GLenum& type_, [<MarshalAs(UnmanagedType.LPArray)>] byte[] name)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glGetActiveUniform(int32 program, int32 index, int32 bufSize, [<Out>] int32& length, [<Out>] int32& size, [<Out>] GLenum& type_, [<MarshalAs(UnmanagedType.LPArray)>] byte[] name)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glGetAttachedShaders(int32 program, int32 maxCount, [<Out>] int32& count, [<MarshalAs(UnmanagedType.LPArray)>] int32[] shaders)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern int32 emu_glGetAttribLocation(int32 program, [<MarshalAs(UnmanagedType.LPStr)>] string name)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glGetBooleanv(GLenum pname, GLboolean * data)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glGetBufferParameteriv(GLenum target, GLenum pname, int32 * parms)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern GLenum emu_glGetError()
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glGetsinglev(GLenum pname, single * data)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glGetFramebufferAttachmentParameteriv(GLenum target, GLenum attachment, GLenum pname, int32 * parms)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glGetIntegerv(GLenum pname, int32 * data)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glGetProgramiv(int32 program, GLenum pname, int32 * parms)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glGetProgramInfoLog(int32 program, int32 bufSize, int32 * length, char * infoLog)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glGetRenderbufferParameteriv(GLenum target, GLenum pname, int32 * parms)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glGetShaderiv(int32 shader, GLenum pname, int32 * parms)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glGetShaderInfoLog(int32 shader, int32 bufSize, int32 * length, char * infoLog)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glGetShaderPrecisionFormat(GLenum shadertype, GLenum precisiontype, int32 * range, int32 * precision)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glGetShaderSource(int32 shader, int32 bufSize, int32 * length, char * source)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern GLubyte* emu_glGetString(GLenum name)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glGetTexParameterfv(GLenum target, GLenum pname, single * parms)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glGetTexParameteriv(GLenum target, GLenum pname, int32 * parms)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glGetUniformfv(int32 program, int32 location, single * parms)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glGetUniformiv(int32 program, int32 location, int32 * parms)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern int32 emu_glGetUniformLocation(int32 program, char * name)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glGetVertexAttribfv(int32 index, GLenum pname, single * parms)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glGetVertexAttribiv(int32 index, GLenum pname, int32 * parms)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     //extern void      emu_glGetVertexAttribPointerv  (int32 index, GLenum pname, void **pointer);                                                                                                      
     extern unit emu_glGetVertexAttribPointerv(int32 index, GLenum pname, IntPtr pointer)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glHint(GLenum target, GLenum mode)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern GLboolean emu_glIsBuffer(int32 buffer)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern GLboolean emu_glIsEnabled(GLenum cap)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern GLboolean emu_glIsFramebuffer(int32 framebuffer)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern GLboolean emu_glIsProgram(int32 program)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern GLboolean emu_glIsRenderbuffer(int32 renderbuffer)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern GLboolean emu_glIsShader(int32 shader)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern GLboolean emu_glIsTexture(int32 texture)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glLineWidth(single width)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glLinkProgram(int32 program)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glPixelStorei(GLenum pname, int32 param)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glPolygonOffset(single factor, single units)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glReadPixels(int32 x, int32 y, int32 width, int32 height, GLenum format, GLenum type_, void * pixels)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glReleaseShaderCompiler()
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glRenderbufferStorage(GLenum target, GLenum internalformat, int32 width, int32 height)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glSampleCoverage(single value, GLboolean invert)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glScissor(int32 x, int32 y, int32 width, int32 height)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glShaderBinary(int32 count, int32 * shaders, GLenum binaryformat, void * binary, int32 length)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glShaderSource(int32 shader, int32 count, string[] str, [<MarshalAs(UnmanagedType.LPArray)>] int32[] length)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glStencilFunc(GLenum func, int32 ref_, int32 mask)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glStencilFuncSeparate(GLenum face, GLenum func, int32 ref_, int32 mask)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glStencilMask(int32 mask)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glStencilMaskSeparate(GLenum face, int32 mask)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glStencilOp(GLenum fail, GLenum zfail, GLenum zpass)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glStencilOpSeparate(GLenum face, GLenum sfail, GLenum dpfail, GLenum dppass)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glTexImage2D(GLenum target, int32 level, int32 internalformat, int32 width, int32 height, int32 border, GLenum format, GLenum type_, void * pixels)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glTexParameterf(GLenum target, GLenum pname, single param)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glTexParameterfv(GLenum target, GLenum pname, [<MarshalAs(UnmanagedType.LPArray)>] single[] parms)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glTexParameteri(GLenum target, GLenum pname, int32 param)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glTexParameteriv(GLenum target, GLenum pname, [<MarshalAs(UnmanagedType.LPArray)>] int32[] parms)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glTexSubImage2D(GLenum target, int32 level, int32 xoffset, int32 yoffset, int32 width, int32 height, GLenum format, GLenum type_, void * pixels)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glUniform1f(int32 location, single v0)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glUniform1fv(int32 location, int32 count, [<MarshalAs(UnmanagedType.LPArray)>] single[] value)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glUniform1i(int32 location, int32 v0)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glUniform1iv(int32 location, int32 count, [<MarshalAs(UnmanagedType.LPArray)>] int32[] value)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glUniform2f(int32 location, single v0, single v1)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glUniform2fv(int32 location, int32 count, [<MarshalAs(UnmanagedType.LPArray)>] single[] value)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glUniform2i(int32 location, int32 v0, int32 v1)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glUniform2iv(int32 location, int32 count, [<MarshalAs(UnmanagedType.LPArray)>] int32[] value)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glUniform3f(int32 location, single v0, single v1, single v2)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glUniform3fv(int32 location, int32 count, [<MarshalAs(UnmanagedType.LPArray)>] single[] value)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glUniform3i(int32 location, int32 v0, int32 v1, int32 v2)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glUniform3iv(int32 location, int32 count, [<MarshalAs(UnmanagedType.LPArray)>] int32[] value)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glUniform4f(int32 location, single v0, single v1, single v2, single v3)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glUniform4fv(int32 location, int32 count, [<MarshalAs(UnmanagedType.LPArray)>] single[] value)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glUniform4i(int32 location, int32 v0, int32 v1, int32 v2, int32 v3)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glUniform4iv(int32 location, int32 count, [<MarshalAs(UnmanagedType.LPArray)>] int32[] value)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glUniformMatrix2fv(int32 location, int32 count, GLboolean transpose, [<MarshalAs(UnmanagedType.LPArray)>] single[] value)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glUniformMatrix3fv(int32 location, int32 count, GLboolean transpose, [<MarshalAs(UnmanagedType.LPArray)>] single[] value)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glUniformMatrix4fv(int32 location, int32 count, GLboolean transpose, [<MarshalAs(UnmanagedType.LPArray)>] single[] value)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glUseProgram(int32 program)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glValidateProgram(int32 program)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glVertexAttrib1f(int32 index, single x)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glVertexAttrib1fv(int32 index, single * v)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glVertexAttrib2f(int32 index, single x, single y)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glVertexAttrib2fv(int32 index, single * v)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glVertexAttrib3f(int32 index, single x, single y, single z)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glVertexAttrib3fv(int32 index, single * v)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glVertexAttrib4f(int32 index, single x, single y, single z, single w)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glVertexAttrib4fv(int32 index, single * v)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glVertexAttribPointer(int32 index, int32 size, GLenum type_, GLboolean normalized, int32 stride, IntPtr pointer)
     
-    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)>]
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glViewport(int32 x, int32 y, int32 width, int32 height)
 
 let b2GLb (b: bool) = if b then 1uy else 0uy
@@ -839,7 +839,7 @@ let glCompressedTexSubImage<'T when 'T : struct> (target, level, xoffset, yoffse
 let glCopyTexImage2D        = emu_glCopyTexImage2D      
 let glCopyTexSubImage2D     = emu_glCopyTexSubImage2D   
 let glCreateProgram         = emu_glCreateProgram        
-let glCreateShader          = emu_glCreateShader         
+let glCreateShader e        = emu_glCreateShader e        
 let glCullFace              = emu_glCullFace             
 
 let glDeleteBuffers (buffers: int32[]) =  emu_glDeleteBuffers (buffers.Length, buffers)
