@@ -149,7 +149,7 @@ type GLenum =
     | GL_UNSIGNED_SHORT                 = 0x1403
     | GL_INT                            = 0x1404
     | GL_UNSIGNED_INT                   = 0x1405
-    | GL_single                          = 0x1406
+    | GL_FLOAT                          = 0x1406
     | GL_FIXED                          = 0x140C
     | GL_DEPTH_COMPONENT                = 0x1902
     | GL_ALPHA                          = 0x1906
@@ -255,9 +255,9 @@ type GLenum =
     | GL_REPEAT                         = 0x2901
     | GL_CLAMP_TO_EDGE                  = 0x812F
     | GL_MIRRORED_REPEAT                = 0x8370
-    | GL_single_VEC2                     = 0x8B50
-    | GL_single_VEC3                     = 0x8B51
-    | GL_single_VEC4                     = 0x8B52
+    | GL_FLOAT_VEC2                     = 0x8B50
+    | GL_FLOAT_VEC3                     = 0x8B51
+    | GL_FLOAT_VEC4                     = 0x8B52
     | GL_INT_VEC2                       = 0x8B53
     | GL_INT_VEC3                       = 0x8B54
     | GL_INT_VEC4                       = 0x8B55
@@ -265,9 +265,9 @@ type GLenum =
     | GL_BOOL_VEC2                      = 0x8B57
     | GL_BOOL_VEC3                      = 0x8B58
     | GL_BOOL_VEC4                      = 0x8B59
-    | GL_single_MAT2                     = 0x8B5A
-    | GL_single_MAT3                     = 0x8B5B
-    | GL_single_MAT4                     = 0x8B5C
+    | GL_FLOAT_MAT2                     = 0x8B5A
+    | GL_FLOAT_MAT3                     = 0x8B5B
+    | GL_FLOAT_MAT4                     = 0x8B5C
     | GL_SAMPLER_2D                     = 0x8B5E
     | GL_SAMPLER_CUBE                   = 0x8B60
     | GL_VERTEX_ATTRIB_ARRAY_ENABLED    = 0x8622
@@ -468,6 +468,9 @@ module private Native =
     
     [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glDrawArrays(GLenum mode, int32 first, int32 count)
+
+    [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
+    extern unit emu_glDrawElements(GLenum mode, int32 count, GLenum type_, IntPtr indices)
     
     [<DllImport(DllName, EntryPoint = "emu_glDrawElements", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glDrawElementsU16(GLenum mode, int32 count, GLenum type_, [<MarshalAs(UnmanagedType.LPArray)>] uint16[] indices)
@@ -791,14 +794,14 @@ let glBlendEquationSeparate = emu_glBlendEquationSeparate
 let glBlendFunc             = emu_glBlendFunc            
 let glBlendFuncSeparate     = emu_glBlendFuncSeparate   
  
-let glBufferData<'T when 'T : struct> (target, size, data: 'T[], usage) =
+let glBufferData<'T when 'T : struct> (target, data: 'T[], usage) =
     let gch = GCHandle.Alloc (data, GCHandleType.Pinned)
-    emu_glBufferData (target, size, gch.AddrOfPinnedObject(), usage)
+    emu_glBufferData (target, Marshal.SizeOf<'T>() * data.Length, gch.AddrOfPinnedObject(), usage)
     gch.Free ()
 
-let glBufferSubData<'T when 'T : struct> (target, offset, size, data: 'T[]) =
+let glBufferSubData<'T when 'T : struct> (target, offset, data: 'T[]) =
     let gch = GCHandle.Alloc (data, GCHandleType.Pinned)  
-    emu_glBufferSubData (target, offset, size, gch.AddrOfPinnedObject ())
+    emu_glBufferSubData (target, offset, Marshal.SizeOf<'T>() * data.Length, gch.AddrOfPinnedObject ())
     gch.Free ()
 
 [<StructAttribute; StructLayoutAttribute(LayoutKind.Sequential)>]
@@ -864,8 +867,9 @@ let glDisable               = emu_glDisable
 let glDisableVertexAttribArray = emu_glDisableVertexAttribArray
 let glDrawArrays            = emu_glDrawArrays           
 
-let glDrawElementsU16 (mode, count, type_, indices: uint16[]) = emu_glDrawElementsU16 (mode, count, type_, indices)
-let glDrawElementsU32 (mode, count, type_, indices: uint32[]) = emu_glDrawElementsU32 (mode, count, type_, indices)
+let glDrawElements    (mode, count, type_, offset: int) = emu_glDrawElements (mode, count, type_, IntPtr.Add(IntPtr.Zero, offset))
+let glDrawElementsU16 (mode, count, indices: uint16[]) = emu_glDrawElementsU16 (mode, count, GLenum.GL_UNSIGNED_SHORT, indices)
+let glDrawElementsU32 (mode, count, indices: uint32[]) = emu_glDrawElementsU32 (mode, count, GLenum.GL_UNSIGNED_INT, indices)
 
 let glEnable                = emu_glEnable               
 let glEnableVertexAttribArray = emu_glEnableVertexAttribArray
@@ -1029,5 +1033,5 @@ let glVertexAttrib1f        = emu_glVertexAttrib1f
 //let glVertexAttrib4fv       = emu_glVertexAttrib4fv      (int32 index, single *v)
 
 /// only allow buffers to be used with glVertexAttribPointer
-let glVertexAttribPointer (index, size, type_, normalized, stride, pointer : int) = emu_glVertexAttribPointer  (index, size, type_, normalized, stride, IntPtr.Add(nativeint(0), pointer))
+let glVertexAttribPointer (index, size, type_, normalized, stride, pointer : int) = emu_glVertexAttribPointer  (index, size, type_, (if normalized then byte(1) else byte(0)), stride, IntPtr.Add(nativeint(0), pointer))
 let glViewport              = emu_glViewport

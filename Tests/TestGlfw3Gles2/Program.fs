@@ -1,8 +1,15 @@
 ﻿// Learn more about F# at http://fsharp.org
 // See the 'F# Tutorial' project for more help.
 
+open System.Runtime
+open System.Runtime.InteropServices
+
 open FsRTK
-open Gles2
+open FsRTK.Math3D.Vector
+open FsRTK.Math3D.Matrix
+open FsRTK.Gles2
+
+#nowarn "9"
 
 type Program =
     { Vertex      : string
@@ -24,6 +31,20 @@ let simple =
         "void main() {\n" +
         "    gl_FragColor = varColor;\n" +
         "}" }
+
+[<StructAttribute; StructLayoutAttribute(LayoutKind.Sequential)>]
+type Vertex =
+    val     position    : vec4
+    val     color       : vec4
+
+    new(p, c)   = { position = p; color = c }
+
+let verts =
+    [| Vertex(vec4(0.0f, -1.0f, 0.0f, 1.0f), vec4(1.0f, 0.0f, 0.0f, 1.0f))
+       Vertex(vec4(-0.6f, 1.0f, 0.0f, 1.0f), vec4(0.0f, 1.0f, 0.0f, 1.0f))
+       Vertex(vec4(0.6f, 1.0f, 0.0f, 1.0f), vec4(0.0f, 0.0f, 1.0f, 1.0f)) |]
+
+let indices = [| 0; 1; 2 |]
 
 [<EntryPoint>]
 let main argv = 
@@ -83,14 +104,45 @@ let main argv =
 
     let vsId = glCreateShader GLenum.GL_VERTEX_SHADER
     let fsId = glCreateShader GLenum.GL_FRAGMENT_SHADER
+    let progId = glCreateProgram ()
 
     glShaderSource (vsId, [| simple.Vertex   |])
     glShaderSource (fsId, [| simple.Fragment |])
+
+    glCompileShader vsId
+    glCompileShader fsId
+
+    glAttachShader (progId, vsId)
+    glAttachShader (progId, fsId)
+
+    glLinkProgram progId
+
+    let posId = glGetAttribLocation(progId, "attrPosition")
+    let colId = glGetAttribLocation(progId, "attrColor")
+
+    let buffers = glGenBuffers 2
+
+    glBindBuffer (GLenum.GL_ARRAY_BUFFER, buffers.[0])
+    glBufferData (GLenum.GL_ARRAY_BUFFER, verts, GLenum.GL_DYNAMIC_DRAW)
+
+    glBindBuffer (GLenum.GL_ELEMENT_ARRAY_BUFFER, buffers.[1])
+    glBufferData (GLenum.GL_ELEMENT_ARRAY_BUFFER, indices, GLenum.GL_DYNAMIC_DRAW)
 
     let windowRefresh win =
         let r, g, b, a = rnd.NextDouble() |> single, rnd.NextDouble() |> single, rnd.NextDouble() |> single, rnd.NextDouble() |> single
         glClearColor(r, g, b, a)
         glClear ((GLenum.GL_COLOR_BUFFER_BIT ||| GLenum.GL_DEPTH_BUFFER_BIT) |> int32)
+        glUseProgram progId
+
+        glEnableVertexAttribArray(posId)
+        glEnableVertexAttribArray(colId)
+        
+        glBindBuffer(GLenum.GL_ARRAY_BUFFER, buffers.[0])
+        glVertexAttribPointer(posId, 4, GLenum.GL_FLOAT, false, Marshal.SizeOf<Vertex>(), 0)
+        glVertexAttribPointer(colId, 4, GLenum.GL_FLOAT, false, Marshal.SizeOf<Vertex>(), 4 * 4)
+
+        glBindBuffer (GLenum.GL_ELEMENT_ARRAY_BUFFER, buffers.[1])
+        glDrawElements(GLenum.GL_TRIANGLES, 3, GLenum.GL_UNSIGNED_INT, 0)
         Glfw3.swapBuffers win
 
     glClearColor(1.f, 0.5f, 0.5f, 0.f)
@@ -118,6 +170,9 @@ let main argv =
             loop ()
 
     loop ()
+
+    glDeleteBuffers buffers
+
     printfn "Pos : %A" (Glfw3.getWindowPos win)
     printfn "Size: %A" (Glfw3.getWindowSize win)
     0 // return an integer exit code
