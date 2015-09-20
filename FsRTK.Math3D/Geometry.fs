@@ -45,3 +45,13 @@ type size2 =
     static member asVec2 (s: size2) = s.AsVec2
     static member ofVec2 (v: vec2)  = size2(v.x, v.y)
 
+[<StructAttribute; StructLayoutAttribute(LayoutKind.Sequential)>]
+type tri<'I> =
+    val         v0  : 'I
+    val         v1  : 'I
+    val         v2  : 'I
+
+    new(v0, v1, v2) = { v0 = v0; v1 = v1; v2 = v2 }
+
+type tri16  = tri<uint16>
+type tri32  = tri<uint32>

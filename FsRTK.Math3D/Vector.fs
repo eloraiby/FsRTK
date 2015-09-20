@@ -115,3 +115,96 @@ type vec4 =
     static member length (v: vec4)              = Math.Sqrt(vec4.dot(v, v) |> float) |> single
     static member distance (v0: vec4, v1: vec4) = let s = v1 - v0 in vec4.length s
     static member normalize (v: vec4)           = let l = vec4.length v in v / l   
+
+
+[<StructAttribute; StructLayoutAttribute(LayoutKind.Sequential)>]
+type ivec2 =
+    val         x   : int
+    val         y   : int
+
+    new(x, y) = { x = x; y = y }
+
+    member x.Item i =
+        match i with
+        | 0 -> x.x
+        | 1 -> x.y
+        | _ -> failwith "vec2: index out of range"
+
+    static member (+) (a: ivec2, b: ivec2)    = ivec2(a.x + b.x, a.y + b.y)
+    static member (-) (a: ivec2, b: ivec2)    = ivec2(a.x - b.x, a.y - b.y)
+    static member (*) (a: ivec2, b: ivec2)    = ivec2(a.x * b.x, a.y * b.y)
+    static member (/) (a: ivec2, b: ivec2)    = ivec2(a.x / b.x, a.y / b.y)
+
+    static member (*) (a: ivec2, b: int)  = ivec2(a.x * b, a.y * b)
+    static member (/) (a: ivec2, b: int)  = ivec2(a.x / b, a.y / b)
+
+    static member dot (a: ivec2, b: ivec2)        =  a.x * b.x + a.y * b.y
+    static member length (v: ivec2)               = Math.Sqrt(ivec2.dot(v, v) |> float) |> int
+    static member distance (v0: ivec2, v1: ivec2) = let s = v1 - v0 in ivec2.length s
+    static member normalize (v: ivec2)            = let l = ivec2.length v in v / l
+
+    static member orhtogonal (a: ivec2)      = ivec2(-a.y, a.x)
+    static member orthogonal2 (a: ivec2)     = ivec2(a.y, -a.x)
+
+[<StructAttribute; StructLayoutAttribute(LayoutKind.Sequential)>]
+type ivec3 =
+    val         x   : int
+    val         y   : int
+    val         z   : int
+    
+    new(x, y, z) = { x = x; y = y; z = z }
+    new(v2: ivec2, z) = { x = v2.x; y = v2.y; z = z }
+
+    member x.Item i =
+        match i with
+        | 0 -> x.x
+        | 1 -> x.y
+        | 2 -> x.z
+        | _ -> failwith "vec3: index out of range"
+
+    member x.xy = ivec2(x.x, x.y)
+
+    static member (+) (a: ivec3, b: ivec3)    = ivec3(a.x + b.x, a.y + b.y, a.z + b.z)
+    static member (-) (a: ivec3, b: ivec3)    = ivec3(a.x - b.x, a.y - b.y, a.z - b.z)
+    static member (*) (a: ivec3, b: ivec3)    = ivec3(a.x * b.x, a.y * b.y, a.z * b.z)
+    static member (/) (a: ivec3, b: ivec3)    = ivec3(a.x / b.x, a.y / b.y, a.z / b.z)
+
+    static member (*) (a: ivec3, b: int)  = ivec3(a.x * b, a.y * b, a.z * b)
+    static member (/) (a: ivec3, b: int)  = ivec3(a.x / b, a.y / b, a.z / b)
+
+    static member dot (a: ivec3, b: ivec3)        =  a.x * b.x + a.y * b.y + a.z * b.z
+    static member length (v: ivec3)               = Math.Sqrt(ivec3.dot(v, v) |> float) |> int
+    static member distance (v0: ivec3, v1: ivec3) = let s = v1 - v0 in ivec3.length s
+    static member normalize (v: ivec3)            = let l = ivec3.length v in v / l
+
+    static member cross (a: ivec3, b: ivec3)  = ivec3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x)
+
+[<StructAttribute; StructLayoutAttribute(LayoutKind.Sequential)>]
+type ivec4 =
+    val         x   : int
+    val         y   : int
+    val         z   : int
+    val         w   : int
+    
+    new(x, y, z, w) = { x = x; y = y; z = z; w = w }
+
+    member x.Item i =
+        match i with
+        | 0 -> x.x
+        | 1 -> x.y
+        | 2 -> x.z
+        | 3 -> x.w
+        | _ -> failwith "vec4: index out of range"
+
+    static member (+) (a: ivec4, b: ivec4)    = ivec4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w)
+    static member (-) (a: ivec4, b: ivec4)    = ivec4(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w)
+    static member (*) (a: ivec4, b: ivec4)    = ivec4(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w)
+    static member (/) (a: ivec4, b: ivec4)    = ivec4(a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w)
+
+    static member (*) (a: ivec4, b: int)  = ivec4(a.x * b, a.y * b, a.z * b, a.w * b)
+    static member (/) (a: ivec4, b: int)  = ivec4(a.x / b, a.y / b, a.z / b, a.w / b)
+
+    static member dot (a: ivec4, b: ivec4)        =  a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w
+    static member length (v: ivec4)               = Math.Sqrt(ivec4.dot(v, v) |> float) |> int
+    static member distance (v0: ivec4, v1: ivec4) = let s = v1 - v0 in ivec4.length s
+    static member normalize (v: ivec4)            = let l = ivec4.length v in v / l   

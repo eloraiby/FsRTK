@@ -870,6 +870,15 @@ let glDrawArrays            = emu_glDrawArrays
 let glDrawElements    (mode, count, type_, offset: int) = emu_glDrawElements (mode, count, type_, IntPtr.Add(IntPtr.Zero, offset))
 let glDrawElementsU16 (mode, count, indices: uint16[]) = emu_glDrawElementsU16 (mode, count, GLenum.GL_UNSIGNED_SHORT, indices)
 let glDrawElementsU32 (mode, count, indices: uint32[]) = emu_glDrawElementsU32 (mode, count, GLenum.GL_UNSIGNED_INT, indices)
+let glDrawElementsTri16 (tris: Math3D.Geometry.tri16[]) =
+    let gch = GCHandle.Alloc (tris, GCHandleType.Pinned)  
+    emu_glDrawElements (GLenum.GL_TRIANGLES, tris.Length * 3, GLenum.GL_UNSIGNED_SHORT, gch.AddrOfPinnedObject ())
+    gch.Free()
+
+let glDrawElementsTri32 (tris: Math3D.Geometry.tri32[]) =
+    let gch = GCHandle.Alloc (tris, GCHandleType.Pinned)  
+    emu_glDrawElements (GLenum.GL_TRIANGLES, tris.Length * 3, GLenum.GL_UNSIGNED_INT, gch.AddrOfPinnedObject ())
+    gch.Free()
 
 let glEnable                = emu_glEnable               
 let glEnableVertexAttribArray = emu_glEnableVertexAttribArray

@@ -129,7 +129,11 @@ let main argv =
     glBufferData (GLenum.GL_ELEMENT_ARRAY_BUFFER, indices, GLenum.GL_DYNAMIC_DRAW)
 
     let windowRefresh win =
+        let viewWidth, viewHeight = Glfw3.getWindowSize win
+        glViewport (0, 0, viewWidth, viewHeight)
+
         let r, g, b, a = rnd.NextDouble() |> single, rnd.NextDouble() |> single, rnd.NextDouble() |> single, rnd.NextDouble() |> single
+
         glClearColor(r, g, b, a)
         glClear ((GLenum.GL_COLOR_BUFFER_BIT ||| GLenum.GL_DEPTH_BUFFER_BIT) |> int32)
         glUseProgram progId
@@ -156,7 +160,7 @@ let main argv =
     Glfw3.setKeyCallback(win, fun (w, k, i, a, m) -> printfn "%A - %d - %A - %A" k i a m; printfn "Key State: %A" (Glfw3.getKey (w, k)))
     Glfw3.setCharCallback(win, fun (w, c) -> printfn "%c" c)
     Glfw3.setCharModsCallback(win, fun (w, c, m) -> printfn "%c - %A" c m)
-    Glfw3.setMouseButtonCallback(win, fun (w, b, a, m) -> printfn "mouse %A, %A, %A" b a m; (*printfn "clipboard: %s" (Glfw3.getClipboardString w)*))
+    Glfw3.setMouseButtonCallback(win, fun (w, b, a, m) -> printfn "mouse %A, %A, %A" b a m; printfn "clipboard: %s" (Glfw3.getClipboardString w))
     Glfw3.setCursorPosCallback(win, fun (w, x, y) -> printfn "pos: %f, %f" x y)
     Glfw3.setCursorEnterCallback(win, fun (w, b) -> printfn "Enter: %b" b)
     Glfw3.setScrollCallback(win, fun (w, x, y) -> printfn "Scroll: %f %f" x y)
