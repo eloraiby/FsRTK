@@ -72,6 +72,15 @@ let main argv =
                 let biNormals   = mesh.BiTangents                    |> Seq.map (fun bn -> vec3(bn.X, bn.Y, bn.Z)) |> Seq.toArray
                 let tcoords     = mesh.TextureCoordinateChannels.[0] |> Seq.map (fun tc -> vec2(tc.X, tc.Y))       |> Seq.toArray
 
+                let bones =
+                    mesh.Bones
+                    |> Seq.toArray
+                    |> Array.mapi
+                        (fun i bone ->
+                            printfn "-- bone.Name           : %s" bone.Name
+                            printfn "-- bone.weight count   : %d" bone.VertexWeightCount
+                            (i, bone.VertexWeights |> Seq.map(fun vw -> vw.VertexID, vw.Weight)))
+
                 let m = { RenderMesh.Vertices =
                             mesh.Vertices
                             |> Seq.mapi
@@ -86,9 +95,7 @@ let main argv =
                             |> Seq.toArray
                           Triangles = [||] }
 
-                for b in mesh.Bones do
-                    printfn "-- bone.Name           : %s" b.Name
-                    printfn "-- bone.weight count   : %d" b.VertexWeightCount
                 m)
+        |> Seq.toArray
 
     0 // return an integer exit code
