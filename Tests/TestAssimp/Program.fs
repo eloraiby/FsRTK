@@ -21,9 +21,9 @@ type Vertex =
         val     TexCoords   : vec2
         val     Weights     : vec4
         val     Bones       : ivec4
-    end
 
-    new(p, n, tn, btn, tc, w, b)    = { Position = p; Normal = n; Tangent = tn; BiTangent = btn; TexCoords = tc; Weights = w; Bones = b }
+        new(p, n, tn, btn, tc, w, b)    = { Position = p; Normal = n; Tangent = tn; BiTangent = btn; TexCoords = tc; Weights = w; Bones = b }
+    end
 
 type RenderMesh = Mesh32<Vertex>
 
@@ -65,12 +65,16 @@ let main argv =
                 printfn "- mesh.face count     : %d" mesh.FaceCount
                 printfn "- mesh.vertex count   : %d" mesh.VertexCount
 
+                // start by building the vertices
                 let positions   = mesh.Vertices                      |> Seq.map (fun v  -> vec3(v.X, v.Y, v.Z))    |> Seq.toArray
                 let normals     = mesh.Normals                       |> Seq.map (fun n  -> vec3(n.X, n.Y, n.Z))    |> Seq.toArray
                 let tangents    = mesh.Tangents                      |> Seq.map (fun t  -> vec3(t.X, t.Y, t.Z))    |> Seq.toArray
                 let biTangents  = mesh.BiTangents                    |> Seq.map (fun bt -> vec3(bt.X, bt.Y, bt.Z)) |> Seq.toArray
                 let biNormals   = mesh.BiTangents                    |> Seq.map (fun bn -> vec3(bn.X, bn.Y, bn.Z)) |> Seq.toArray
                 let tcoords     = mesh.TextureCoordinateChannels.[0] |> Seq.map (fun tc -> vec2(tc.X, tc.Y))       |> Seq.toArray
+
+                // build the triangles
+                let tris        = mesh.Faces                         |> Seq.map (fun f -> tri32(f.Indices.[0] |> uint32, f.Indices.[1] |> uint32, f.Indices.[2] |> uint32)) |> Seq.toArray
 
                 let bones =
                     mesh.Bones
