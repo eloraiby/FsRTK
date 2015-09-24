@@ -55,3 +55,17 @@ type tri<'I> =
 
 type tri16  = tri<uint16>
 type tri32  = tri<uint32>
+
+[<StructAttribute; StructLayoutAttribute(LayoutKind.Sequential)>]
+type rect =
+    val         position    : vec2
+    val         size        : size2
+
+    new(p, s)   = { position = p; size = s }
+
+    member x.Contains (p: vec2) =
+        p.x >= x.position.x &&
+        p.y >= x.position.y &&
+        p.x <= x.position.x + x.size.width &&
+        p.y <= x.position.y + x.size.height
+
