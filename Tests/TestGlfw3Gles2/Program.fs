@@ -142,8 +142,8 @@ let main argv =
         glEnableVertexAttribArray(colId)
         
         glBindBuffer(GLenum.GL_ARRAY_BUFFER, buffers.[0])
-        glVertexAttribPointer(posId, 4, GLenum.GL_FLOAT, false, Marshal.SizeOf<Vertex>(), 0)
-        glVertexAttribPointer(colId, 4, GLenum.GL_FLOAT, false, Marshal.SizeOf<Vertex>(), 4 * 4)
+        glVertexAttribPointer(posId, 4, GLenum.GL_FLOAT, false, glSizeOf<Vertex>, 0)
+        glVertexAttribPointer(colId, 4, GLenum.GL_FLOAT, false, glSizeOf<Vertex>, 4 * 4)
 
         glBindBuffer (GLenum.GL_ELEMENT_ARRAY_BUFFER, buffers.[1])
         glDrawElements(GLenum.GL_TRIANGLES, 3, GLenum.GL_UNSIGNED_INT, 0)

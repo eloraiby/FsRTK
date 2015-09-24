@@ -793,15 +793,17 @@ let glBlendEquation         = emu_glBlendEquation
 let glBlendEquationSeparate = emu_glBlendEquationSeparate
 let glBlendFunc             = emu_glBlendFunc            
 let glBlendFuncSeparate     = emu_glBlendFuncSeparate   
- 
+
+let glSizeOf<'T> = Marshal.SizeOf(typedefof<'T>)
+
 let glBufferData<'T when 'T : struct> (target, data: 'T[], usage) =
     let gch = GCHandle.Alloc (data, GCHandleType.Pinned)
-    emu_glBufferData (target, Marshal.SizeOf<'T>() * data.Length, gch.AddrOfPinnedObject(), usage)
+    emu_glBufferData (target, glSizeOf<'T> * data.Length, gch.AddrOfPinnedObject(), usage)
     gch.Free ()
 
 let glBufferSubData<'T when 'T : struct> (target, offset, data: 'T[]) =
     let gch = GCHandle.Alloc (data, GCHandleType.Pinned)  
-    emu_glBufferSubData (target, offset, Marshal.SizeOf<'T>() * data.Length, gch.AddrOfPinnedObject ())
+    emu_glBufferSubData (target, offset, glSizeOf<'T> * data.Length, gch.AddrOfPinnedObject ())
     gch.Free ()
 
 [<StructAttribute; StructLayoutAttribute(LayoutKind.Sequential)>]
