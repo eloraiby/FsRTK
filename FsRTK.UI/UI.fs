@@ -118,7 +118,6 @@ type private RenderState =
     | Active
     | Normal
     | Disabled
-
 with
     static member mapControlState e (isHot, isActive) =
         match e with
@@ -128,3 +127,15 @@ with
             | true, false -> Hot
             | false, false -> Normal
         | InputReception.Discard -> Disabled
+
+type Presenter = {
+    DrawTile           : int * vec2 -> unit
+    Flush              : unit -> unit
+    TileSize           : Map<int, size2>
+    NormalFontTiles    : Map<char, int>
+    BoldFontTiles      : Map<char, int>
+    TitleFontTiles     : Map<char, int>
+    WidgetTiles        : Map<string, int>
+}
+
+
