@@ -88,6 +88,9 @@ type rect =
         p.x <= x.position.x + x.size.width &&
         p.y <= x.position.y + x.size.height
 
+    member x.Width = x.size.width
+    member x.Height = x.size.height
+
 [<StructAttribute; StructLayoutAttribute(LayoutKind.Sequential)>]
 type irect =
     val         position    : ivec2
@@ -101,3 +104,6 @@ type irect =
         p.y >= x.position.y &&
         p.x <= x.position.x + x.size.width &&
         p.y <= x.position.y + x.size.height
+
+    member x.Width = x.size.width
+    member x.Height = x.size.height

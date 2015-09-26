@@ -46,7 +46,7 @@ let testSkyline() =
     for rect in dst do
         match rect with
         | Some rect ->
-            let rect = Rectangle(rect.position.x, rect.position.y, rect.size.width, rect.size.height)
+            let rect = Rectangle(rect.position.x, rect.position.y, rect.Width, rect.Height)
             g.FillRectangle(Brushes.Blue, rect)
             g.DrawRectangle(pen, rect)
         | None -> ()

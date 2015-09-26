@@ -55,18 +55,18 @@ type Atlas  = {
 
 let rectangleFits (atlas: Atlas, index: int, rect: irect) =
     let x = atlas.[index].X
-    if x + rect.size.width > atlas.Width
+    if x + rect.Width > atlas.Width
     then (false, 0)
     else
         let rec loop (i, y, widthLeft) =
             if widthLeft > 0
             then
                 let y = max y atlas.[i].Y
-                if y + rect.size.height > atlas.Height
+                if y + rect.Height > atlas.Height
                 then (false, 0)
                 else loop(i + 1, y, widthLeft - atlas.[i].Width)
             else (true, y)
-        loop (index, atlas.[index].Y, rect.size.width)
+        loop (index, atlas.[index].Y, rect.Width)
 
 
 let findPositionForNewNodeBottomLeft (skyline: Atlas, rect: irect) =
@@ -75,14 +75,14 @@ let findPositionForNewNodeBottomLeft (skyline: Atlas, rect: irect) =
         then
             let ok, y = rectangleFits (skyline, i, rect)
             
-            if ok && ( y + rect.size.height < bestHeight
-                  || ( y + rect.size.height = bestHeight
+            if ok && ( y + rect.Height < bestHeight
+                  || ( y + rect.Height = bestHeight
                   && skyline.[i].Width < bestWidth))
             then
-                let bestHeight  = y + rect.size.height
+                let bestHeight  = y + rect.Height
                 let bestIndex   = i
                 let bestWidth   = skyline.[i].Width
-                let newNode     = irect(skyline.[i].X, y, rect.size.width, rect.size.height)
+                let newNode     = irect(skyline.[i].X, y, rect.Width, rect.Height)
                 loop (i + 1, bestWidth, bestHeight, newNode, bestIndex)
             else loop (i + 1, bestWidth, bestHeight, newNode, bestIndex)
         else newNode, bestHeight, bestWidth, bestIndex
@@ -102,7 +102,7 @@ let mergeSkylines (skyline: Atlas) =
     loop 0
 
 let addSkylineLevel (skyline: Atlas, skylineNodeIndex: int, rect: irect)  =
-    let newNode = { X = rect.position.x; Y = rect.position.y + rect.size.height; Width = rect.size.width }
+    let newNode = { X = rect.position.x; Y = rect.position.y + rect.Height; Width = rect.Width }
     skyline.Insert (skylineNodeIndex, newNode)
 
     let rec loop i =
@@ -126,8 +126,8 @@ let addSkylineLevel (skyline: Atlas, skylineNodeIndex: int, rect: irect)  =
 let insert(skyLine: Atlas, rect: irect) =
     let newNode, score1, score2, index = findPositionForNewNodeBottomLeft(skyLine, rect)
 
-    if index <> -1 && newNode.size.height = 0
-    then printfn "Warning: %d,%d -> %d, %d" rect.size.width rect.size.height newNode.size.width newNode.size.height
+    if index <> -1 && newNode.Height = 0
+    then printfn "Warning: %d,%d -> %d, %d" rect.Width rect.Height newNode.Width newNode.Height
 
     if index <> -1
     then
