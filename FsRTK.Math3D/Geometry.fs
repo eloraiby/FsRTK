@@ -1,5 +1,5 @@
 ﻿(*
-** Math3D for F#
+** F# Rendering ToolKit
 ** Copyright (C) 2015  Wael El Oraiby
 ** 
 ** This program is free software: you can redistribute it and/or modify

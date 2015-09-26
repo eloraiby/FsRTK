@@ -16,7 +16,11 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-module FsRTK.Math3D.Transform
+open System
+open SharpFont
 
+[<EntryPoint>]
+let main argv = 
+    printfn "%A" argv
 
-
+    0 // return an integer exit code
