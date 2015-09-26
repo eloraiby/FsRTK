@@ -46,6 +46,24 @@ type size2 =
     static member ofVec2 (v: vec2)  = size2(v.x, v.y)
 
 [<StructAttribute; StructLayoutAttribute(LayoutKind.Sequential)>]
+type isize2 =
+    val         width   : int
+    val         height  : int
+
+    new(w, h) = { width = w; height = h }
+
+    member x.Item i =
+        match i with
+        | 0 -> x.width
+        | 1 -> x.height
+        | _ -> failwith "size2: index out of range"
+
+    member x.AsIVec2   = ivec2(x.width, x.height)
+
+    static member asIVec2 (s: isize2) = s.AsIVec2
+    static member ofIVec2 (v: ivec2)  = isize2(v.x, v.y)
+
+[<StructAttribute; StructLayoutAttribute(LayoutKind.Sequential)>]
 type tri<'I> =
     val         v0  : 'I
     val         v1  : 'I
@@ -62,6 +80,7 @@ type rect =
     val         size        : size2
 
     new(p, s)   = { position = p; size = s }
+    new(x, y, w, h) = { position = vec2(x, y); size = size2(w, h) }
 
     member x.Contains (p: vec2) =
         p.x >= x.position.x &&
@@ -69,3 +88,16 @@ type rect =
         p.x <= x.position.x + x.size.width &&
         p.y <= x.position.y + x.size.height
 
+[<StructAttribute; StructLayoutAttribute(LayoutKind.Sequential)>]
+type irect =
+    val         position    : ivec2
+    val         size        : isize2
+
+    new(p, s)   = { position = p; size = s }
+    new(x, y, w, h) = { position = ivec2(x, y); size = isize2(w, h) }
+
+    member x.Contains (p: ivec2) =
+        p.x >= x.position.x &&
+        p.y >= x.position.y &&
+        p.x <= x.position.x + x.size.width &&
+        p.y <= x.position.y + x.size.height
