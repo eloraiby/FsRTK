@@ -22,10 +22,7 @@ open System
 open System.Runtime
 open System.Runtime.InteropServices
 
-#nowarn "9"
-
-[<StructAttribute; StructLayoutAttribute(LayoutKind.Sequential)>]
-type vec2 =
+type vec2 = struct
     val         x   : single
     val         y   : single
 
@@ -37,24 +34,24 @@ type vec2 =
         | 1 -> x.y
         | _ -> failwith "vec2: index out of range"
 
-    static member (+) (a: vec2, b: vec2)    = vec2(a.x + b.x, a.y + b.y)
-    static member (-) (a: vec2, b: vec2)    = vec2(a.x - b.x, a.y - b.y)
-    static member (*) (a: vec2, b: vec2)    = vec2(a.x * b.x, a.y * b.y)
-    static member (/) (a: vec2, b: vec2)    = vec2(a.x / b.x, a.y / b.y)
+    static member inline (+) (a: vec2, b: vec2)    = vec2(a.x + b.x, a.y + b.y)
+    static member inline (-) (a: vec2, b: vec2)    = vec2(a.x - b.x, a.y - b.y)
+    static member inline (*) (a: vec2, b: vec2)    = vec2(a.x * b.x, a.y * b.y)
+    static member inline (/) (a: vec2, b: vec2)    = vec2(a.x / b.x, a.y / b.y)
 
-    static member (*) (a: vec2, b: single)  = vec2(a.x * b, a.y * b)
-    static member (/) (a: vec2, b: single)  = vec2(a.x / b, a.y / b)
+    static member inline (*) (a: vec2, b: single)  = vec2(a.x * b, a.y * b)
+    static member inline (/) (a: vec2, b: single)  = vec2(a.x / b, a.y / b)
 
-    static member dot (a: vec2, b: vec2)        =  a.x * b.x + a.y * b.y
-    static member length (v: vec2)              = Math.Sqrt(vec2.dot(v, v) |> float) |> single
-    static member distance (v0: vec2, v1: vec2) = let s = v1 - v0 in vec2.length s
-    static member normalize (v: vec2)           = let l = vec2.length v in v / l
+    static member inline dot (a: vec2, b: vec2)        =  a.x * b.x + a.y * b.y
+    static member inline length (v: vec2)              = Math.Sqrt(vec2.dot(v, v) |> float) |> single
+    static member inline distance (v0: vec2, v1: vec2) = let s = v1 - v0 in vec2.length s
+    static member inline normalize (v: vec2)           = let l = vec2.length v in v / l
 
-    static member orhtogonal (a: vec2)      = vec2(-a.y, a.x)
-    static member orthogonal2 (a: vec2)     = vec2(a.y, -a.x)
+    static member inline orhtogonal (a: vec2)      = vec2(-a.y, a.x)
+    static member inline orthogonal2 (a: vec2)     = vec2(a.y, -a.x)
+    end
 
-[<StructAttribute; StructLayoutAttribute(LayoutKind.Sequential)>]
-type vec3 =
+type vec3 = struct
     val         x   : single
     val         y   : single
     val         z   : single
@@ -71,23 +68,23 @@ type vec3 =
 
     member x.xy = vec2(x.x, x.y)
 
-    static member (+) (a: vec3, b: vec3)    = vec3(a.x + b.x, a.y + b.y, a.z + b.z)
-    static member (-) (a: vec3, b: vec3)    = vec3(a.x - b.x, a.y - b.y, a.z - b.z)
-    static member (*) (a: vec3, b: vec3)    = vec3(a.x * b.x, a.y * b.y, a.z * b.z)
-    static member (/) (a: vec3, b: vec3)    = vec3(a.x / b.x, a.y / b.y, a.z / b.z)
+    static member inline (+) (a: vec3, b: vec3)    = vec3(a.x + b.x, a.y + b.y, a.z + b.z)
+    static member inline (-) (a: vec3, b: vec3)    = vec3(a.x - b.x, a.y - b.y, a.z - b.z)
+    static member inline (*) (a: vec3, b: vec3)    = vec3(a.x * b.x, a.y * b.y, a.z * b.z)
+    static member inline (/) (a: vec3, b: vec3)    = vec3(a.x / b.x, a.y / b.y, a.z / b.z)
 
-    static member (*) (a: vec3, b: single)  = vec3(a.x * b, a.y * b, a.z * b)
-    static member (/) (a: vec3, b: single)  = vec3(a.x / b, a.y / b, a.z / b)
+    static member inline (*) (a: vec3, b: single)  = vec3(a.x * b, a.y * b, a.z * b)
+    static member inline (/) (a: vec3, b: single)  = vec3(a.x / b, a.y / b, a.z / b)
 
-    static member dot (a: vec3, b: vec3)        =  a.x * b.x + a.y * b.y + a.z * b.z
-    static member length (v: vec3)              = Math.Sqrt(vec3.dot(v, v) |> float) |> single
-    static member distance (v0: vec3, v1: vec3) = let s = v1 - v0 in vec3.length s
-    static member normalize (v: vec3)           = let l = vec3.length v in v / l
+    static member inline dot (a: vec3, b: vec3)        =  a.x * b.x + a.y * b.y + a.z * b.z
+    static member inline length (v: vec3)              = Math.Sqrt(vec3.dot(v, v) |> float) |> single
+    static member inline distance (v0: vec3, v1: vec3) = let s = v1 - v0 in vec3.length s
+    static member inline normalize (v: vec3)           = let l = vec3.length v in v / l
 
-    static member cross (a: vec3, b: vec3)  = vec3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x)
+    static member inline cross (a: vec3, b: vec3)  = vec3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x)
+    end
 
-[<StructAttribute; StructLayoutAttribute(LayoutKind.Sequential)>]
-type vec4 =
+type vec4 = struct
     val         x   : single
     val         y   : single
     val         z   : single
@@ -103,22 +100,22 @@ type vec4 =
         | 3 -> x.w
         | _ -> failwith "vec4: index out of range"
 
-    static member (+) (a: vec4, b: vec4)    = vec4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w)
-    static member (-) (a: vec4, b: vec4)    = vec4(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w)
-    static member (*) (a: vec4, b: vec4)    = vec4(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w)
-    static member (/) (a: vec4, b: vec4)    = vec4(a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w)
+    static member inline (+) (a: vec4, b: vec4)    = vec4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w)
+    static member inline (-) (a: vec4, b: vec4)    = vec4(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w)
+    static member inline (*) (a: vec4, b: vec4)    = vec4(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w)
+    static member inline (/) (a: vec4, b: vec4)    = vec4(a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w)
 
-    static member (*) (a: vec4, b: single)  = vec4(a.x * b, a.y * b, a.z * b, a.w * b)
-    static member (/) (a: vec4, b: single)  = vec4(a.x / b, a.y / b, a.z / b, a.w / b)
+    static member inline (*) (a: vec4, b: single)  = vec4(a.x * b, a.y * b, a.z * b, a.w * b)
+    static member inline (/) (a: vec4, b: single)  = vec4(a.x / b, a.y / b, a.z / b, a.w / b)
 
-    static member dot (a: vec4, b: vec4)        =  a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w
-    static member length (v: vec4)              = Math.Sqrt(vec4.dot(v, v) |> float) |> single
-    static member distance (v0: vec4, v1: vec4) = let s = v1 - v0 in vec4.length s
-    static member normalize (v: vec4)           = let l = vec4.length v in v / l   
+    static member inline dot (a: vec4, b: vec4)        =  a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w
+    static member inline length (v: vec4)              = Math.Sqrt(vec4.dot(v, v) |> float) |> single
+    static member inline distance (v0: vec4, v1: vec4) = let s = v1 - v0 in vec4.length s
+    static member inline normalize (v: vec4)           = let l = vec4.length v in v / l
+    end
 
 
-[<StructAttribute; StructLayoutAttribute(LayoutKind.Sequential)>]
-type ivec2 =
+type ivec2 = struct
     val         x   : int
     val         y   : int
 
@@ -130,24 +127,24 @@ type ivec2 =
         | 1 -> x.y
         | _ -> failwith "vec2: index out of range"
 
-    static member (+) (a: ivec2, b: ivec2)    = ivec2(a.x + b.x, a.y + b.y)
-    static member (-) (a: ivec2, b: ivec2)    = ivec2(a.x - b.x, a.y - b.y)
-    static member (*) (a: ivec2, b: ivec2)    = ivec2(a.x * b.x, a.y * b.y)
-    static member (/) (a: ivec2, b: ivec2)    = ivec2(a.x / b.x, a.y / b.y)
+    static member inline (+) (a: ivec2, b: ivec2)    = ivec2(a.x + b.x, a.y + b.y)
+    static member inline (-) (a: ivec2, b: ivec2)    = ivec2(a.x - b.x, a.y - b.y)
+    static member inline (*) (a: ivec2, b: ivec2)    = ivec2(a.x * b.x, a.y * b.y)
+    static member inline (/) (a: ivec2, b: ivec2)    = ivec2(a.x / b.x, a.y / b.y)
 
-    static member (*) (a: ivec2, b: int)  = ivec2(a.x * b, a.y * b)
-    static member (/) (a: ivec2, b: int)  = ivec2(a.x / b, a.y / b)
+    static member inline (*) (a: ivec2, b: int)  = ivec2(a.x * b, a.y * b)
+    static member inline (/) (a: ivec2, b: int)  = ivec2(a.x / b, a.y / b)
 
-    static member dot (a: ivec2, b: ivec2)        =  a.x * b.x + a.y * b.y
-    static member length (v: ivec2)               = Math.Sqrt(ivec2.dot(v, v) |> float) |> int
-    static member distance (v0: ivec2, v1: ivec2) = let s = v1 - v0 in ivec2.length s
-    static member normalize (v: ivec2)            = let l = ivec2.length v in v / l
+    static member inline dot (a: ivec2, b: ivec2)        =  a.x * b.x + a.y * b.y
+    static member inline length (v: ivec2)               = Math.Sqrt(ivec2.dot(v, v) |> float) |> int
+    static member inline distance (v0: ivec2, v1: ivec2) = let s = v1 - v0 in ivec2.length s
+    static member inline normalize (v: ivec2)            = let l = ivec2.length v in v / l
 
-    static member orhtogonal (a: ivec2)      = ivec2(-a.y, a.x)
-    static member orthogonal2 (a: ivec2)     = ivec2(a.y, -a.x)
+    static member inline orhtogonal (a: ivec2)      = ivec2(-a.y, a.x)
+    static member inline orthogonal2 (a: ivec2)     = ivec2(a.y, -a.x)
+    end
 
-[<StructAttribute; StructLayoutAttribute(LayoutKind.Sequential)>]
-type ivec3 =
+type ivec3 = struct
     val         x   : int
     val         y   : int
     val         z   : int
@@ -164,23 +161,23 @@ type ivec3 =
 
     member x.xy = ivec2(x.x, x.y)
 
-    static member (+) (a: ivec3, b: ivec3)    = ivec3(a.x + b.x, a.y + b.y, a.z + b.z)
-    static member (-) (a: ivec3, b: ivec3)    = ivec3(a.x - b.x, a.y - b.y, a.z - b.z)
-    static member (*) (a: ivec3, b: ivec3)    = ivec3(a.x * b.x, a.y * b.y, a.z * b.z)
-    static member (/) (a: ivec3, b: ivec3)    = ivec3(a.x / b.x, a.y / b.y, a.z / b.z)
+    static member inline (+) (a: ivec3, b: ivec3)    = ivec3(a.x + b.x, a.y + b.y, a.z + b.z)
+    static member inline (-) (a: ivec3, b: ivec3)    = ivec3(a.x - b.x, a.y - b.y, a.z - b.z)
+    static member inline (*) (a: ivec3, b: ivec3)    = ivec3(a.x * b.x, a.y * b.y, a.z * b.z)
+    static member inline (/) (a: ivec3, b: ivec3)    = ivec3(a.x / b.x, a.y / b.y, a.z / b.z)
 
-    static member (*) (a: ivec3, b: int)  = ivec3(a.x * b, a.y * b, a.z * b)
-    static member (/) (a: ivec3, b: int)  = ivec3(a.x / b, a.y / b, a.z / b)
+    static member inline (*) (a: ivec3, b: int)  = ivec3(a.x * b, a.y * b, a.z * b)
+    static member inline (/) (a: ivec3, b: int)  = ivec3(a.x / b, a.y / b, a.z / b)
 
-    static member dot (a: ivec3, b: ivec3)        =  a.x * b.x + a.y * b.y + a.z * b.z
-    static member length (v: ivec3)               = Math.Sqrt(ivec3.dot(v, v) |> float) |> int
-    static member distance (v0: ivec3, v1: ivec3) = let s = v1 - v0 in ivec3.length s
-    static member normalize (v: ivec3)            = let l = ivec3.length v in v / l
+    static member inline dot (a: ivec3, b: ivec3)        =  a.x * b.x + a.y * b.y + a.z * b.z
+    static member inline length (v: ivec3)               = Math.Sqrt(ivec3.dot(v, v) |> float) |> int
+    static member inline distance (v0: ivec3, v1: ivec3) = let s = v1 - v0 in ivec3.length s
+    static member inline normalize (v: ivec3)            = let l = ivec3.length v in v / l
 
-    static member cross (a: ivec3, b: ivec3)  = ivec3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x)
+    static member inline cross (a: ivec3, b: ivec3)  = ivec3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x)
+    end
 
-[<StructAttribute; StructLayoutAttribute(LayoutKind.Sequential)>]
-type ivec4 =
+type ivec4 = struct
     val         x   : int
     val         y   : int
     val         z   : int
@@ -196,15 +193,16 @@ type ivec4 =
         | 3 -> x.w
         | _ -> failwith "vec4: index out of range"
 
-    static member (+) (a: ivec4, b: ivec4)    = ivec4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w)
-    static member (-) (a: ivec4, b: ivec4)    = ivec4(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w)
-    static member (*) (a: ivec4, b: ivec4)    = ivec4(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w)
-    static member (/) (a: ivec4, b: ivec4)    = ivec4(a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w)
+    static member inline (+) (a: ivec4, b: ivec4)    = ivec4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w)
+    static member inline (-) (a: ivec4, b: ivec4)    = ivec4(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w)
+    static member inline (*) (a: ivec4, b: ivec4)    = ivec4(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w)
+    static member inline (/) (a: ivec4, b: ivec4)    = ivec4(a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w)
 
-    static member (*) (a: ivec4, b: int)  = ivec4(a.x * b, a.y * b, a.z * b, a.w * b)
-    static member (/) (a: ivec4, b: int)  = ivec4(a.x / b, a.y / b, a.z / b, a.w / b)
+    static member inline (*) (a: ivec4, b: int)  = ivec4(a.x * b, a.y * b, a.z * b, a.w * b)
+    static member inline (/) (a: ivec4, b: int)  = ivec4(a.x / b, a.y / b, a.z / b, a.w / b)
 
-    static member dot (a: ivec4, b: ivec4)        =  a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w
-    static member length (v: ivec4)               = Math.Sqrt(ivec4.dot(v, v) |> float) |> int
-    static member distance (v0: ivec4, v1: ivec4) = let s = v1 - v0 in ivec4.length s
-    static member normalize (v: ivec4)            = let l = ivec4.length v in v / l   
+    static member inline dot (a: ivec4, b: ivec4)        =  a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w
+    static member inline length (v: ivec4)               = Math.Sqrt(ivec4.dot(v, v) |> float) |> int
+    static member inline distance (v0: ivec4, v1: ivec4) = let s = v1 - v0 in ivec4.length s
+    static member inline normalize (v: ivec4)            = let l = ivec4.length v in v / l   
+    end

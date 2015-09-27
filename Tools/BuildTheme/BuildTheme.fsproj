@@ -67,9 +67,16 @@
   </Target>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="AtlasBuilder.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
     <Content Include="packages.config" />
+    <Content Include="Fonts\DroidSans.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Fonts\DroidSans-Bold.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Argu">
@@ -86,7 +93,25 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Numerics" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\FsRTK.Algorithms\FsRTK.Algorithms.fsproj">
+      <Name>FsRTK.Algorithms</Name>
+      <Project>{85e3b0cb-885a-43e5-a351-27a8ae66c91e}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\FsRTK.Data\FsRTK.Data.fsproj">
+      <Name>FsRTK.Data</Name>
+      <Project>{9078c99d-6881-4bda-b3e2-53dffd514e90}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\FsRTK.Math3D\FsRTK.Math3D.fsproj">
+      <Name>FsRTK.Math3D</Name>
+      <Project>{b53da48b-1cc6-4ef9-b1f1-9cabccf0450c}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

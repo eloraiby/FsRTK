@@ -25,10 +25,7 @@ open System.Runtime.InteropServices
 open FsRTK
 open Math3D.Vector
 
-#nowarn "9"
-
-[<StructAttribute; StructLayoutAttribute(LayoutKind.Sequential)>]
-type size2 =
+type size2 = struct
     val         width   : single
     val         height  : single
 
@@ -42,11 +39,12 @@ type size2 =
 
     member x.AsVec2   = vec2(x.width, x.height)
 
-    static member asVec2 (s: size2) = s.AsVec2
-    static member ofVec2 (v: vec2)  = size2(v.x, v.y)
+    static member inline asVec2 (s: size2) = s.AsVec2
+    static member inline ofVec2 (v: vec2)  = size2(v.x, v.y)
 
-[<StructAttribute; StructLayoutAttribute(LayoutKind.Sequential)>]
-type isize2 =
+    end
+
+type isize2 = struct
     val         width   : int
     val         height  : int
 
@@ -60,22 +58,24 @@ type isize2 =
 
     member x.AsIVec2   = ivec2(x.width, x.height)
 
-    static member asIVec2 (s: isize2) = s.AsIVec2
-    static member ofIVec2 (v: ivec2)  = isize2(v.x, v.y)
+    static member inline asIVec2 (s: isize2) = s.AsIVec2
+    static member inline ofIVec2 (v: ivec2)  = isize2(v.x, v.y)
 
-[<StructAttribute; StructLayoutAttribute(LayoutKind.Sequential)>]
-type tri<'I> =
+    end
+
+type tri<'I> = struct
     val         v0  : 'I
     val         v1  : 'I
     val         v2  : 'I
 
     new(v0, v1, v2) = { v0 = v0; v1 = v1; v2 = v2 }
 
+    end
+
 type tri16  = tri<uint16>
 type tri32  = tri<uint32>
 
-[<StructAttribute; StructLayoutAttribute(LayoutKind.Sequential)>]
-type rect =
+type rect = struct
     val         position    : vec2
     val         size        : size2
 
@@ -88,11 +88,14 @@ type rect =
         p.x <= x.position.x + x.size.width &&
         p.y <= x.position.y + x.size.height
 
+    member x.X      = x.position.x
+    member x.Y      = x.position.y
     member x.Width = x.size.width
     member x.Height = x.size.height
 
-[<StructAttribute; StructLayoutAttribute(LayoutKind.Sequential)>]
-type irect =
+    end
+
+type irect = struct
     val         position    : ivec2
     val         size        : isize2
 
@@ -105,5 +108,9 @@ type irect =
         p.x <= x.position.x + x.size.width &&
         p.y <= x.position.y + x.size.height
 
-    member x.Width = x.size.width
+    member x.X      = x.position.x
+    member x.Y      = x.position.y
+    member x.Width  = x.size.width
     member x.Height = x.size.height
+
+    end

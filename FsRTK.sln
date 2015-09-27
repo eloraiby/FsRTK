@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FsRTK.Math3D", "FsRTK.Math3D\FsRTK.Math3D.fsproj", "{B53DA48B-1CC6-4EF9-B1F1-9CABCCF0450C}"
 EndProject
@@ -29,6 +29,8 @@ EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FsRTK.Algorithms", "FsRTK.Algorithms\FsRTK.Algorithms.fsproj", "{85E3B0CB-885A-43E5-A351-27A8AE66C91E}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "TestAlgorithms", "Tests\TestAlgorithms\TestAlgorithms.fsproj", "{01698FF5-DB12-4242-A7D6-55940C5A604F}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FsRTK.Data", "FsRTK.Data\FsRTK.Data.fsproj", "{9078C99D-6881-4BDA-B3E2-53DFFD514E90}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -72,6 +74,10 @@ Global
 		{01698FF5-DB12-4242-A7D6-55940C5A604F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{01698FF5-DB12-4242-A7D6-55940C5A604F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{01698FF5-DB12-4242-A7D6-55940C5A604F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9078C99D-6881-4BDA-B3E2-53DFFD514E90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9078C99D-6881-4BDA-B3E2-53DFFD514E90}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9078C99D-6881-4BDA-B3E2-53DFFD514E90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9078C99D-6881-4BDA-B3E2-53DFFD514E90}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -86,5 +92,6 @@ Global
 		{A4DC443E-470E-497A-9D6B-6B992283041A} = {928121A3-BE12-4970-A479-4B0AF2F0E2D7}
 		{85E3B0CB-885A-43E5-A351-27A8AE66C91E} = {782CAF7F-4102-4029-8EDA-9C11D23096EB}
 		{01698FF5-DB12-4242-A7D6-55940C5A604F} = {76EF8D65-FB5A-4AFD-BA1F-4834FB591852}
+		{9078C99D-6881-4BDA-B3E2-53DFFD514E90} = {782CAF7F-4102-4029-8EDA-9C11D23096EB}
 	EndGlobalSection
 EndGlobal
