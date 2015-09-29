@@ -5,6 +5,7 @@ open SharpFont
 open System.Drawing
 open System.IO
 
+open FsRTK
 open FsRTK.Data
 
 open FsRTK.Math3D.Vector
@@ -17,9 +18,7 @@ type RectangleOption =
     | DrawBounds
     | NoBounds
 
-type RenderMode =
-    | AntiAlias
-    | Mono
+
 
 module Source =
     type FontEntry  = {
@@ -41,6 +40,10 @@ module Source =
         Fonts       : FontEntry list
         Icons       : IconEntry list
     }
+
+type irect
+with
+    member x.Rectangle = Rectangle(x.X, x.Y, x.Width, x.Height)
 
 //let sourceExample () =
 //    let cps =
@@ -78,98 +81,98 @@ module Source =
 //    json.Serialize(file, atlas)
 //
 //
-//let compileFont (lib: SharpFont.Library)
-//                (f: Face)
-//                (rm: RenderMode)
-//                (size: int)
-//                (g: Graphics)
-//                (ropt: RectangleOption)
-//                (atlas: SkyLine.Atlas)
-//                (cps: uint32[]) =
-//    f.SetCharSize(Fixed26Dot6(0), Fixed26Dot6(size), 0u, 96u)
-//    use pen = new Pen(Color.Red)
-//    let entries =
-//        cps
-//        |> Array.map
-//            (fun cp ->
-//                let glyphIndex  = f.GetCharIndex cp
-//                f.LoadGlyph (glyphIndex, LoadFlags.Default, LoadTarget.Normal)
-//                
-//                let rm =
-//                    match rm with
-//                    | Ui.RenderMode.AntiAlias -> SharpFont.RenderMode.Normal
-//                    | Ui.RenderMode.Mono      -> SharpFont.RenderMode.Mono
-//
-//                f.Glyph.RenderGlyph(rm)
-//
-//                let ftbmp   = f.Glyph.Bitmap
-//            
-//                let width   = f.Glyph.Metrics.Width              |> single |> float |> Math.Round |> int
-//                let height  = f.Glyph.Metrics.Height             |> single |> float |> Math.Round |> int
-//                let advX    = f.Glyph.Advance.X                  |> single |> float |> Math.Round |> int
-//                let advY    = f.Glyph.Advance.Y                  |> single |> float |> Math.Round |> int
-//                let left    = f.Glyph.BitmapLeft
-//                let top     = f.Glyph.BitmapTop
-//                let newRect = SkyLine.insert (atlas, irect(0, 0, width + 2, height + 2))
-//
-//                match newRect with
-//                | Some rect ->
-//                    if cp <> (' ' |> uint32) && cp <> ('\n' |> uint32)
-//                    then
-//                        use tmpBmp    = ftbmp.ToGdipBitmap Color.White
-//                        // convert to grayscale
-//                        use dstBmp    = new Bitmap(tmpBmp.Width, tmpBmp.Height, Imaging.PixelFormat.Format32bppArgb)
-//                        for y in 0..tmpBmp.Height - 1 do
-//                            for x in 0..tmpBmp.Width - 1 do
-//                                let sCol = tmpBmp.GetPixel(x, y)
-//                                let r    = sCol.R |> int
-//                                let g    = sCol.G |> int
-//                                let b    = sCol.B |> int
-//                                let a    = sCol.A |> int// (r + g + b) / 3
-//                                let dCol  = Color.FromArgb(a, 0xFF, 0xFF, 0xFF)
-//                                dstBmp.SetPixel(x, y, dCol)
-//
-//                        g.DrawImageUnscaled(dstBmp, rect.X + 1, rect.Y + 1)
-//                    
-//                    match ropt with
-//                    | DrawBounds -> g.DrawRectangle(pen, rect)
-//                    | NoBounds   -> ()
-//
-//                    cp, { Ui.CharInfo.AdvanceX  = advX
-//                          Ui.CharInfo.AdvanceY  = advY
-//                          Ui.CharInfo.Width     = width
-//                          Ui.CharInfo.Height    = height
-//                          Ui.CharInfo.Left      = left
-//                          Ui.CharInfo.Top       = top
-//                          Ui.CharInfo.TCoordX   = rect.X + 1
-//                          Ui.CharInfo.TCoordY   = rect.Y + 1
-//                        }
-//                | None -> failwith "Not enough space"
-//
-//            )
-//    entries
-//
-//let compileIcon (g: Graphics) (atlas: SkyLine.Atlas) (ropt: RectangleOption) (pt: string -> string) (icon: Source.IconEntry) =
-//    let bmp         = new Bitmap(pt icon.FileName)
-//    let rect        = Rectangle(0, 0, bmp.Width + 2, bmp.Height + 2)
-//    let placement   = SkyLine.insert (atlas, rect)
-//    use pen         = new Pen(Color.Red)
-//
-//    match placement with
-//    | Some rect ->
-//        g.DrawImageUnscaled(bmp, rect.X + 1, rect.Y + 1)
-//
-//        match ropt with
-//        | DrawBounds -> g.DrawRectangle(pen, rect)
-//        | NoBounds   -> ()
-//
-//        { Ui.IconEntry.FileName   = icon.FileName
-//          Ui.IconEntry.Width      = bmp.Width
-//          Ui.IconEntry.Height     = bmp.Height
-//          Ui.IconEntry.TCoordX    = rect.X + 1
-//          Ui.IconEntry.TCoordY    = rect.Y + 1 }
-//    | None -> failwith "not enough space"
-//
+let compileFont (lib: SharpFont.Library)
+                (f: Face)
+                (rm: Ui.RenderMode)
+                (size: int)
+                (g: Graphics)
+                (ropt: RectangleOption)
+                (atlas: SkyLine.Atlas)
+                (cps: uint32[]) =
+    f.SetCharSize(Fixed26Dot6(0), Fixed26Dot6(size), 0u, 96u)
+    use pen = new Pen(Color.Red)
+    let entries =
+        cps
+        |> Array.map
+            (fun cp ->
+                let glyphIndex  = f.GetCharIndex cp
+                f.LoadGlyph (glyphIndex, LoadFlags.Default, LoadTarget.Normal)
+                
+                let rm =
+                    match rm with
+                    | Ui.RenderMode.AntiAlias -> SharpFont.RenderMode.Normal
+                    | Ui.RenderMode.Mono      -> SharpFont.RenderMode.Mono
+
+                f.Glyph.RenderGlyph(rm)
+
+                let ftbmp   = f.Glyph.Bitmap
+            
+                let width   = f.Glyph.Metrics.Width              |> single |> float |> Math.Round |> int
+                let height  = f.Glyph.Metrics.Height             |> single |> float |> Math.Round |> int
+                let advX    = f.Glyph.Advance.X                  |> single |> float |> Math.Round |> int
+                let advY    = f.Glyph.Advance.Y                  |> single |> float |> Math.Round |> int
+                let left    = f.Glyph.BitmapLeft
+                let top     = f.Glyph.BitmapTop
+                let newRect = SkyLine.insert (atlas, irect(0, 0, width + 2, height + 2))
+
+                match newRect with
+                | Some rect ->
+                    if cp <> (' ' |> uint32) && cp <> ('\n' |> uint32)
+                    then
+                        use tmpBmp    = ftbmp.ToGdipBitmap Color.White
+                        // convert to grayscale
+                        use dstBmp    = new Bitmap(tmpBmp.Width, tmpBmp.Height, Imaging.PixelFormat.Format32bppArgb)
+                        for y in 0..tmpBmp.Height - 1 do
+                            for x in 0..tmpBmp.Width - 1 do
+                                let sCol = tmpBmp.GetPixel(x, y)
+                                let r    = sCol.R |> int
+                                let g    = sCol.G |> int
+                                let b    = sCol.B |> int
+                                let a    = sCol.A |> int// (r + g + b) / 3
+                                let dCol  = Color.FromArgb(a, 0xFF, 0xFF, 0xFF)
+                                dstBmp.SetPixel(x, y, dCol)
+
+                        g.DrawImageUnscaled(dstBmp, rect.X + 1, rect.Y + 1)
+                    
+                    match ropt with
+                    | DrawBounds -> g.DrawRectangle(pen, rect.Rectangle)
+                    | NoBounds   -> ()
+
+                    cp, { Ui.CharInfo.AdvanceX  = advX
+                          Ui.CharInfo.AdvanceY  = advY
+                          Ui.CharInfo.Width     = width
+                          Ui.CharInfo.Height    = height
+                          Ui.CharInfo.Left      = left
+                          Ui.CharInfo.Top       = top
+                          Ui.CharInfo.TCoordX   = rect.X + 1
+                          Ui.CharInfo.TCoordY   = rect.Y + 1
+                        }
+                | None -> failwith "Not enough space"
+
+            )
+    entries
+
+let compileIcon (g: Graphics) (atlas: SkyLine.Atlas) (ropt: RectangleOption) (pt: string -> string) (icon: Source.IconEntry) =
+    let bmp         = new Bitmap(pt icon.FileName)
+    let rect        = irect(0, 0, bmp.Width + 2, bmp.Height + 2)
+    let placement   = SkyLine.insert (atlas, rect)
+    use pen         = new Pen(Color.Red)
+
+    match placement with
+    | Some rect ->
+        g.DrawImageUnscaled(bmp, rect.X + 1, rect.Y + 1)
+
+        match ropt with
+        | DrawBounds -> g.DrawRectangle(pen, rect.Rectangle)
+        | NoBounds   -> ()
+
+        { Ui.IconEntry.FileName   = icon.FileName
+          Ui.IconEntry.Width      = bmp.Width
+          Ui.IconEntry.Height     = bmp.Height
+          Ui.IconEntry.TCoordX    = rect.X + 1
+          Ui.IconEntry.TCoordY    = rect.Y + 1 }
+    | None -> failwith "not enough space"
+
 //let buildAtlas (ftLib: SharpFont.Library) (atlasName: string) (ropt: RectangleOption) =
 //
 //    let getPath (p: string) =

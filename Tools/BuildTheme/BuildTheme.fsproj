@@ -112,6 +112,11 @@
       <Project>{b53da48b-1cc6-4ef9-b1f1-9cabccf0450c}</Project>
       <Private>True</Private>
     </ProjectReference>
+    <ProjectReference Include="..\..\FsRTK.UI\FsRTK.UI.fsproj">
+      <Name>FsRTK.UI</Name>
+      <Project>{8ba917fc-07ef-4ca1-9ec4-f81c434f32ee}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

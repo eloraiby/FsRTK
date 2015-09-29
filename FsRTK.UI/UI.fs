@@ -16,12 +16,35 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-namespace FsRTK.UI
+namespace FsRTK.Ui
 
 open FsRTK
 open FsRTK.Math3D.Vector
 open FsRTK.Math3D.Matrix
 open FsRTK.Math3D.Geometry
+
+type CharInfo = {
+    AdvanceX  : int
+    AdvanceY  : int
+    Width     : int
+    Height    : int
+    Left      : int
+    Top       : int
+    TCoordX   : int
+    TCoordY   : int
+}
+
+type RenderMode =
+    | AntiAlias
+    | Mono
+
+type IconEntry = {
+    FileName   : string
+    Width      : int
+    Height     : int
+    TCoordX    : int
+    TCoordY    : int
+}
 
 type InputReception =
     | Accept
