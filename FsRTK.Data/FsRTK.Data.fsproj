@@ -54,6 +54,7 @@
     <Compile Include="TextConversions.fs" />
     <Compile Include="TextRuntime.fs" />
     <Compile Include="JsonValue.fs" />
+    <Compile Include="Reflection.fs" />
     <Content Include="Apache License.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
