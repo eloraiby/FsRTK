@@ -32,15 +32,11 @@ let serializeBoolean  (v: obj) = JsonValue.Boolean (unbox<bool>   v)
 let serializeString   (v: obj) = JsonValue.String  (unbox<string> v)
 let rec serializeArray (t: Type) (v: obj) =
         let elemType = t.GetElementType ()
-        let o = unbox<System.Collections.IEnumerable> v
-        let en = o.GetEnumerator()
-        let mutable l = []
-        while en.MoveNext() do
-            l <- en.Current :: l
+        let e = unbox<System.Collections.IEnumerable> v
+        let se = Seq.cast<obj> e
 
-        JsonValue.Array (
-            l
-            |> List.toArray
+        JsonValue.Array (se
+            |> Seq.toArray
             |> Array.map (fun o -> valueSerializer elemType o))
 
 and serializeRecord   (t: Type) (v: obj) =
@@ -48,6 +44,12 @@ and serializeRecord   (t: Type) (v: obj) =
     JsonValue.Record (
         fields
         |> Array.map (fun pi -> pi.Name, valueSerializer pi.PropertyType (pi.GetValue v)))
+
+and serializeUnion    (t: Type) (v: obj) =
+    let cases = FSharpType.GetUnionCases t
+    JsonValue.Record(cases
+        |> Array.map(fun c -> c.Name, JsonValue.Record (c.GetFields ()
+                                        |> Array.map (fun pi -> pi.Name, valueSerializer pi.PropertyType (pi.GetValue v)))))
 
 and valueSerializer (t: Type) (v: obj) =
     match t with
@@ -58,6 +60,7 @@ and valueSerializer (t: Type) (v: obj) =
     | t when t = typeof<string>     -> serializeString  v
     | t when t.IsArray              -> serializeArray t v
     | t when FSharpType.IsRecord t  -> serializeRecord t v
+    | t when FSharpType.IsUnion  t  -> serializeUnion t v
     | _ -> failwith "unimplemented"        
 
 let serialize<'T> (v: 'T) = valueSerializer typeof<'T> v

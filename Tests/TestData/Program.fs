@@ -28,6 +28,15 @@ type RecordB = {
     A : RecordA
     B : int[] }
 
+type RecordC = {
+    A : RecordB
+    B : RecordA[]
+}
+
+type UnionA = 
+    | A
+    | B of int
+
 [<EntryPoint>]
 let main argv = 
     let ra = { RecordA.A = 10; B = "Hello World" }
@@ -39,5 +48,18 @@ let main argv =
     let jsRb = Json.serialize rb
 
     printfn "%O\n------------------" jsRb
+
+    let rc = { RecordC.A = rb; B = [| ra; { RecordA.A = 12; B = "haha" } |] }
+    let jsRc = Json.serialize rc
+
+    printfn "%O\n------------------" jsRc
+
+    let a = UnionA.A
+    let b = UnionA.B 10
+
+    let jsA = Json.serialize a
+
+    printfn "%O\n------------------" jsA
+
 
     0 // return an integer exit code
