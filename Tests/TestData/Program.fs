@@ -36,6 +36,7 @@ type RecordC = {
 type UnionA = 
     | A
     | B of int
+    | C of int * string
 
 [<EntryPoint>]
 let main argv = 
@@ -55,11 +56,22 @@ let main argv =
     printfn "%O\n------------------" jsRc
 
     let a = UnionA.A
-    let b = UnionA.B 10
 
     let jsA = Json.serialize a
 
     printfn "%O\n------------------" jsA
+
+    let b = UnionA.B 10
+
+    let jsB = Json.serialize b
+
+    printfn "%O\n------------------" jsB
+
+    let c = UnionA.C (11, "hello")
+
+    let jsC = Json.serialize c
+
+    printfn "%O\n------------------" jsC
 
 
     0 // return an integer exit code
