@@ -47,9 +47,9 @@ and serializeRecord   (t: Type) (v: obj) =
 
 and serializeUnion    (t: Type) (v: obj) =
     let cases = FSharpType.GetUnionCases t
-    JsonValue.Record(cases
-        |> Array.map(fun c -> c.Name, JsonValue.Record (c.GetFields ()
-                                        |> Array.map (fun pi -> pi.Name, valueSerializer pi.PropertyType (pi.GetValue v)))))
+    let ucase, objs = FSharpValue.GetUnionFields (v, t)
+    JsonValue.Record [| "tag", JsonValue.String ucase.Name
+                        "value", JsonValue.Array (objs |> Array.map(fun o -> valueSerializer (o.GetType()) o)) |]
 
 and valueSerializer (t: Type) (v: obj) =
     match t with
