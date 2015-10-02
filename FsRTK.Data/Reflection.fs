@@ -65,4 +65,10 @@ and valueSerializer (t: Type) (v: obj) =
 
 let serialize<'T> (v: 'T) = valueSerializer typeof<'T> v
 
+let deserializeInt      = function | JsonValue.Number  v -> Convert.ToInt32 v  | JsonValue.Float v -> Convert.ToInt32  v | _ -> failwith "unable to convert"
+let deserializeSingle   = function | JsonValue.Number  v -> Convert.ToSingle v | JsonValue.Float v -> Convert.ToSingle v | _ -> failwith "unable to convert"
+let deserializeFloat    = function | JsonValue.Number  v -> Convert.ToDouble v | JsonValue.Float v -> Convert.ToDouble v | _ -> failwith "unable to convert"
+let deserializeBoolean  = function | JsonValue.Boolean v -> v | _ -> failwith "unable to convert"
+let deserializeString   = function | JsonValue.String  v -> v | _ -> failwith "unable to convert"
+
 
