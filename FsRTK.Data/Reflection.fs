@@ -48,8 +48,8 @@ and serializeRecord   (t: Type) (v: obj) =
 and serializeUnion    (t: Type) (v: obj) =
     let cases = FSharpType.GetUnionCases t
     let ucase, objs = FSharpValue.GetUnionFields (v, t)
-    JsonValue.Record [| "tag", JsonValue.String ucase.Name
-                        "value", JsonValue.Array (objs |> Array.map(fun o -> valueSerializer (o.GetType()) o)) |]
+    JsonValue.Record [| "`tag", JsonValue.String ucase.Name
+                        "`value", JsonValue.Array (objs |> Array.map(fun o -> valueSerializer (o.GetType()) o)) |]
 
 and valueSerializer (t: Type) (v: obj) =
     match t with
@@ -65,10 +65,66 @@ and valueSerializer (t: Type) (v: obj) =
 
 let serialize<'T> (v: 'T) = valueSerializer typeof<'T> v
 
-let deserializeInt      = function | JsonValue.Number  v -> Convert.ToInt32 v  | JsonValue.Float v -> Convert.ToInt32  v | _ -> failwith "unable to convert"
-let deserializeSingle   = function | JsonValue.Number  v -> Convert.ToSingle v | JsonValue.Float v -> Convert.ToSingle v | _ -> failwith "unable to convert"
-let deserializeFloat    = function | JsonValue.Number  v -> Convert.ToDouble v | JsonValue.Float v -> Convert.ToDouble v | _ -> failwith "unable to convert"
-let deserializeBoolean  = function | JsonValue.Boolean v -> v | _ -> failwith "unable to convert"
-let deserializeString   = function | JsonValue.String  v -> v | _ -> failwith "unable to convert"
+//------------------------------------------------------------------------------
+// Deserializer
+//------------------------------------------------------------------------------
+let deserializeInt      = function | JsonValue.Number  v -> Convert.ToInt32 v  | JsonValue.Float v -> Convert.ToInt32  v | _ -> failwith "unable to convert JsonValue into int"
+let deserializeSingle   = function | JsonValue.Number  v -> Convert.ToSingle v | JsonValue.Float v -> Convert.ToSingle v | _ -> failwith "unable to convert JsonValue into single"
+let deserializeFloat    = function | JsonValue.Number  v -> Convert.ToDouble v | JsonValue.Float v -> Convert.ToDouble v | _ -> failwith "unable to convert JsonValue into float"
+let deserializeBoolean  = function | JsonValue.Boolean v -> v | _ -> failwith "unable to convert JsonValue to boolean"
+let deserializeString   = function | JsonValue.String  v -> v | _ -> failwith "unable to convert JsonValue to string"
+
+let rec deserializeArray (t: Type) (v: JsonValue) =
+    let elemType = t.GetElementType ()
+    let se =
+        match v with | JsonValue.Array arr -> arr | _ -> failwith "attempt to deserialize a non Json Array into an Array"
+        |> Array.map (fun o -> valueDeserializer elemType o)
+    let arr = Array.CreateInstance (elemType, se.Length)
+    se.CopyTo (arr, 0)
+    arr
 
 
+and deserializeRecord   (t: Type) (v: JsonValue) =    
+    let jsonFields = match v with | JsonValue.Record r -> r |> Map.ofArray | _ -> failwith "attempt to deserialize a non Json Record into a Record"
+
+    let fields =
+        FSharpType.GetRecordFields t
+        |> Array.map (fun pi -> valueDeserializer pi.PropertyType jsonFields.[pi.Name])
+    FSharpValue.MakeRecord(t, fields)
+
+and deserializeUnion    (t: Type) (v: JsonValue) =
+    let jsonFields = match v with | JsonValue.Record r -> r |> Map.ofArray | _ -> failwith "attempt to deserialize a non Json Union into a Union"
+    let tag = deserializeString jsonFields.["`tag"]
+    let case =
+        FSharpType.GetUnionCases t
+        |> Array.map (fun ci -> ci.Name, ci)
+        |> Map.ofArray
+        |> Map.find tag
+
+    let jsValues =
+        match jsonFields.["`value"] with
+        | JsonValue.Array arr -> arr
+        | _ -> failwith "value for union case should be an array"
+
+    let values =
+        case.GetFields()      
+        |> Array.zip jsValues
+        |> Array.map (fun (jsv, pi) ->
+            valueDeserializer pi.PropertyType jsv)
+
+    FSharpValue.MakeUnion(case, values)
+
+and valueDeserializer (t: Type) (v: JsonValue) : obj =
+    match t with
+    | t when t = typeof<int>        -> deserializeInt     v  |> box
+    | t when t = typeof<single>     -> deserializeSingle  v  |> box
+    | t when t = typeof<float>      -> deserializeFloat   v  |> box
+    | t when t = typeof<bool>       -> deserializeBoolean v  |> box
+    | t when t = typeof<string>     -> deserializeString  v  |> box
+    | t when t.IsArray              -> deserializeArray t v  |> box
+    | t when FSharpType.IsRecord t  -> deserializeRecord t v |> box
+    | t when FSharpType.IsUnion  t  -> deserializeUnion t v  |> box
+    | _ -> failwith "unimplemented"   
+   
+
+let deserialize<'T> (v: JsonValue) = valueDeserializer typeof<'T> v |> unbox<'T>

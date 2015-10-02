@@ -42,34 +42,37 @@ type UnionA =
 let main argv = 
     let ra = { RecordA.A = 10; B = "Hello World" }
     let jsRa = Json.serialize ra
+    let rra = Json.deserialize<RecordA> jsRa
 
     printfn "%O\n------------------" jsRa
 
     let rb = { RecordB.A = ra; B = [| 10; 7; 3 |] }
     let jsRb = Json.serialize rb
+    let rrb = Json.deserialize<RecordB> jsRb
 
     printfn "%O\n------------------" jsRb
 
     let rc = { RecordC.A = rb; B = [| ra; { RecordA.A = 12; B = "haha" } |] }
     let jsRc = Json.serialize rc
+    let rrc = Json.deserialize<RecordC> jsRc
 
     printfn "%O\n------------------" jsRc
 
     let a = UnionA.A
-
     let jsA = Json.serialize a
+    let rra = Json.deserialize<UnionA> jsA
 
     printfn "%O\n------------------" jsA
 
     let b = UnionA.B 10
-
     let jsB = Json.serialize b
+    let rrb = Json.deserialize<UnionA> jsB
 
     printfn "%O\n------------------" jsB
 
     let c = UnionA.C (11, "hello")
-
     let jsC = Json.serialize c
+    let rrc = Json.deserialize<UnionA> jsC
 
     printfn "%O\n------------------" jsC
 
