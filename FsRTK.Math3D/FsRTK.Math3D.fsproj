@@ -10,7 +10,7 @@
     <RootNamespace>FsRTK.Math3D</RootNamespace>
     <AssemblyName>FsRTK.Math3D</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <TargetFSharpCoreVersion>4.3.0.0</TargetFSharpCoreVersion>
+    <TargetFSharpCoreVersion>4.3.1.0</TargetFSharpCoreVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Name>FsRTK.Math3D</Name>
     <TargetFrameworkProfile />
