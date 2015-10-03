@@ -120,6 +120,21 @@ and deserializeUnion    (t: Type) (v: JsonValue) =
 
     FSharpValue.MakeUnion(case, values)
 
+and deserializeTuple (t: Type) (v: JsonValue) =
+    let jsonFields = match v with | JsonValue.Record r -> r |> Map.ofArray | _ -> failwith "attempt to deserialize a non Json Union into a Union"
+    let jsValues =
+        match jsonFields.["`tuple"] with
+        | JsonValue.Array arr -> arr
+        | _ -> failwith "value for tuple should be an array"
+    let values =
+        FSharpType.GetTupleElements t    
+        |> Array.zip jsValues
+        |> Array.map (fun (jsv, t) ->
+            valueDeserializer t jsv)
+
+    FSharpValue.MakeTuple (values, t)
+
+    
 and valueDeserializer (t: Type) (v: JsonValue) : obj =
     match t with
     | t when t = typeof<int>        -> deserializeInt     v  |> box
@@ -130,6 +145,7 @@ and valueDeserializer (t: Type) (v: JsonValue) : obj =
     | t when t.IsArray              -> deserializeArray t v  |> box
     | t when FSharpType.IsRecord t  -> deserializeRecord t v |> box
     | t when FSharpType.IsUnion  t  -> deserializeUnion t v  |> box
+    | t when FSharpType.IsTuple  t  -> deserializeTuple t v  |> box
     | _ -> failwith "unimplemented"   
    
 

@@ -91,7 +91,7 @@ let main argv =
     let jst = Json.serialize (111, "hhhaaa", 32.0f)
     let rrc = Json.deserialize<int * string * single> jst
 
-    //assert(c = rrc)
+    assert((111, "hhhaaa", 32.0f) = rrc)
 
     printfn "%O\n------------------" jsC
 
