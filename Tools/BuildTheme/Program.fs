@@ -52,8 +52,27 @@ let argParser = ArgumentParser.Create<Arguments> ()
 [<EntryPoint>]
 let main argv =
     try
-        let values = argParser.Parse argv
-        printfn "correct arguments"
+        let usage           = argParser.Usage ()
+        let values          = argParser.Parse argv
+        
+        let theme           = values.GetResults <@ Theme         @> |> Set.ofList |> Set.toArray
+        let addIcon         = values.GetResults <@ Add_Icon      @> |> Set.ofList
+        let removeIcon      = values.GetResults <@ Remove_Icon   @> |> Set.ofList
+        let addWidget       = values.GetResults <@ Add_Widget    @> |> Set.ofList
+        let removeWidget    = values.GetResults <@ Remove_Widget @> |> Set.ofList
+        let addFont         = values.GetResults <@ Add_Font      @> |> Set.ofList
+        let removeFont      = values.GetResults <@ Remove_Font   @> |> Set.ofList
+        let buildTo         = values.GetResults <@ Build_To      @> |> Set.ofList
+
+        if theme.Length > 1
+        then failwith (sprintf "you can have only 1 theme file, got: %d\nUsage:\n%s" theme.Length usage)
+            
+        let iconsToAdd      = Set.intersect addIcon removeIcon  |> Set.toArray
+        let iconsToRemove   = removeIcon                        |> Set.toArray
+
+
+        printfn "Theme file: %s" theme.[0]
+
     with e ->
         printfn "Fatal Error: %s" e.Message
 
