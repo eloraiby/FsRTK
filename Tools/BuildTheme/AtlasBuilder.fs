@@ -13,12 +13,11 @@ open FsRTK.Math3D.Matrix
 open FsRTK.Math3D.Geometry
 
 open FsRTK.Algorithms
+open FsRTK.Ui
 
 type RectangleOption =
     | DrawBounds
     | NoBounds
-
-
 
 module Source =
     type FontEntry  = {
@@ -26,7 +25,7 @@ module Source =
         SymName     : string
         Size        : int
         Mode        : RenderMode
-        CodePoints  : uint32[]
+        CodePoints  : int[]
     }
 
     type IconEntry  = {
@@ -45,42 +44,42 @@ type irect
 with
     member x.Rectangle = Rectangle(x.X, x.Y, x.Width, x.Height)
 
-//let sourceExample () =
-//    let cps =
-//        "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM,./;'[]\\1234567890`-=~!@#$%^&*()_+{}|:<>?\" "
-//        |> Seq.map(fun x -> x |> uint32)
-//        |> Array.ofSeq
-//
-//    let atlas = {
-//        Source.Atlas.Width  = 512
-//        Source.Atlas.Height = 512
-//        Source.Atlas.Fonts  =
-//            [ { Source.FontEntry.FileName = "DroidSans.ttf"
-//                Source.FontEntry.SymName  = "droid-sans.12.aa"
-//                Source.FontEntry.Size     = 12
-//                Source.FontEntry.Mode     = RenderMode.AntiAlias
-//                Source.FontEntry.CodePoints   = cps }
-//
-//              { Source.FontEntry.FileName = "DroidSans.ttf"
-//                Source.FontEntry.SymName  = "droid-sans.14.m"
-//                Source.FontEntry.Size     = 14
-//                Source.FontEntry.Mode     = RenderMode.Mono
-//                Source.FontEntry.CodePoints   = cps.Clone() :?> _ }   ]
-//
-//        Source.Atlas.Icons  =
-//             [
-//                 { Source.IconEntry.FileName = "white.png"         ; Source.IconEntry.SymName = "white" }
-//                 { Source.IconEntry.FileName = "folder-open.png"   ; Source.IconEntry.SymName = "folder-open" }
-//                 { Source.IconEntry.FileName = "folder-music.png"  ; Source.IconEntry.SymName = "folder-music" }
-//                 { Source.IconEntry.FileName = "folder-videos.png" ; Source.IconEntry.SymName = "folder-videos" }
-//             ]
-//    }
-//    
-//    use file    = File.CreateText ("example.source.atlas")
-//    let json    = FsPickler.CreateJson(indent = true, omitHeader = true)
-//    json.Serialize(file, atlas)
-//
-//
+let sourceExample () =
+    let cps =
+        "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM,./;'[]\\1234567890`-=~!@#$%^&*()_+{}|:<>?\" "
+        |> Seq.map(fun x -> x |> int)
+        |> Array.ofSeq
+
+    let atlas = {
+        Source.Atlas.Width  = 512
+        Source.Atlas.Height = 512
+        Source.Atlas.Fonts  =
+            [ { Source.FontEntry.FileName = "DroidSans.ttf"
+                Source.FontEntry.SymName  = "droid-sans.12.aa"
+                Source.FontEntry.Size     = 12
+                Source.FontEntry.Mode     = RenderMode.AntiAlias
+                Source.FontEntry.CodePoints   = cps }
+
+              { Source.FontEntry.FileName = "DroidSans.ttf"
+                Source.FontEntry.SymName  = "droid-sans.14.m"
+                Source.FontEntry.Size     = 14
+                Source.FontEntry.Mode     = RenderMode.Mono
+                Source.FontEntry.CodePoints   = cps.Clone() :?> _ }   ]
+
+        Source.Atlas.Icons  =
+             [
+                 { Source.IconEntry.FileName = "white.png"         ; Source.IconEntry.SymName = "white" }
+                 { Source.IconEntry.FileName = "folder-open.png"   ; Source.IconEntry.SymName = "folder-open" }
+                 { Source.IconEntry.FileName = "folder-music.png"  ; Source.IconEntry.SymName = "folder-music" }
+                 { Source.IconEntry.FileName = "folder-videos.png" ; Source.IconEntry.SymName = "folder-videos" }
+             ]
+    }
+    
+    use file    = File.CreateText ("example.source.atlas")
+    let json    = Json.serialize atlas
+    file.Write (json.ToString ())
+
+
 let compileFont (lib: SharpFont.Library)
                 (f: Face)
                 (rm: Ui.RenderMode)
@@ -88,14 +87,14 @@ let compileFont (lib: SharpFont.Library)
                 (g: Graphics)
                 (ropt: RectangleOption)
                 (atlas: SkyLine.Atlas)
-                (cps: uint32[]) =
+                (cps: int[]) =
     f.SetCharSize(Fixed26Dot6(0), Fixed26Dot6(size), 0u, 96u)
     use pen = new Pen(Color.Red)
     let entries =
         cps
         |> Array.map
             (fun cp ->
-                let glyphIndex  = f.GetCharIndex cp
+                let glyphIndex  = f.GetCharIndex (uint32 <| cp)
                 f.LoadGlyph (glyphIndex, LoadFlags.Default, LoadTarget.Normal)
                 
                 let rm =
@@ -117,7 +116,7 @@ let compileFont (lib: SharpFont.Library)
 
                 match newRect with
                 | Some rect ->
-                    if cp <> (' ' |> uint32) && cp <> ('\n' |> uint32)
+                    if cp <> (' ' |> int) && cp <> ('\n' |> int)
                     then
                         use tmpBmp    = ftbmp.ToGdipBitmap Color.White
                         // convert to grayscale
@@ -173,58 +172,61 @@ let compileIcon (g: Graphics) (atlas: SkyLine.Atlas) (ropt: RectangleOption) (pt
           Ui.IconEntry.TCoordY    = rect.Y + 1 }
     | None -> failwith "not enough space"
 
-//let buildAtlas (ftLib: SharpFont.Library) (atlasName: string) (ropt: RectangleOption) =
-//
-//    let getPath (p: string) =
-//        if Path.IsPathRooted p
-//        then p
-//        else Path.Combine (Path.GetDirectoryName atlasName, p)
-//
-//    let srcAtlas =
-//        let readAtlas () =
-//            use file = File.OpenText (atlasName + ".source.atlas")
-//            let json = FsPickler.CreateJson(omitHeader = true)
-//            json.Deserialize<Source.Atlas>(file)
-//        readAtlas()
-//
-//    use tmpBmp = new Bitmap(srcAtlas.Width, srcAtlas.Height, Imaging.PixelFormat.Format32bppArgb)
-//    let bmp = tmpBmp :> Image
-//    use g = Graphics.FromImage bmp
-//
-//    g.FillRectangle(Brushes.Transparent, 0, 0, srcAtlas.Width, srcAtlas.Height)
-//    
-//    let slAtlas = SkyLine.Atlas.init(srcAtlas.Width, srcAtlas.Height)
-//
-//    let fontMap =
-//        srcAtlas.Fonts
-//        |> List.map
-//            (fun f ->
-//                let fontName    = getPath f.FileName
-//                use face = ftLib.NewFace (fontName, 0)
-//                let cpMap   = compileFont ftLib face f.Mode f.Size g ropt slAtlas f.CodePoints
-//                f.SymName
-//                , { Ui.FontEntry.FileName   = f.FileName
-//                    Ui.FontEntry.Mode       = f.Mode
-//                    Ui.FontEntry.Size       = f.Size
-//                    Ui.FontEntry.CodePoints = Map.ofArray cpMap })
-//        |> Map.ofList
-//
-//    // horizontal separator
-//    SkyLine.insert (slAtlas, Rectangle(0, 0, srcAtlas.Width - 1, 1)) |> ignore
-//
-//    let iconMap =
-//        srcAtlas.Icons
-//        |> List.map (fun ic -> ic.SymName, compileIcon g slAtlas ropt getPath ic)
-//        |> Map.ofList
-//
-//    let cmplAtlas   = {
-//        Ui.Atlas.ImageName    = Path.GetFileName(atlasName + ".png")
-//        Ui.Atlas.ImageWidth   = bmp.Width
-//        Ui.Atlas.ImageHeight  = bmp.Height
-//        Ui.Atlas.Fonts        = fontMap
-//        Ui.Atlas.Icons        = iconMap
-//    }
-//                      
-//    bmp.Save (atlasName + ".png", Imaging.ImageFormat.Png)
-//    
-//    Ui.Atlas.toFile (atlasName + ".compiled.atlas") cmplAtlas
+let buildAtlas (ftLib: SharpFont.Library) (atlasName: string) (ropt: RectangleOption) =
+
+    let getPath (p: string) =
+        if Path.IsPathRooted p
+        then p
+        else Path.Combine (Path.GetDirectoryName atlasName, p)
+
+    let srcAtlas =
+        let readAtlas () =
+            use file = File.OpenText (atlasName + ".source.atlas")
+            let json = JsonValue.Parse (file.ReadToEnd ())
+            Json.deserialize<Source.Atlas> json
+        readAtlas()
+
+    use tmpBmp = new Bitmap(srcAtlas.Width, srcAtlas.Height, Imaging.PixelFormat.Format32bppArgb)
+    let bmp = tmpBmp :> Image
+    use g = Graphics.FromImage bmp
+
+    g.FillRectangle(Brushes.Transparent, 0, 0, srcAtlas.Width, srcAtlas.Height)
+    
+    let slAtlas = SkyLine.Atlas.init(srcAtlas.Width, srcAtlas.Height)
+
+    let fontMap =
+        srcAtlas.Fonts
+        |> List.map
+            (fun f ->
+                let fontName    = getPath f.FileName
+                use face = ftLib.NewFace (fontName, 0)
+                let cpMap   = compileFont ftLib face f.Mode f.Size g ropt slAtlas f.CodePoints
+                f.SymName
+                , { FontEntry.FileName   = f.FileName
+                    FontEntry.Mode       = f.Mode
+                    FontEntry.Size       = f.Size
+                    FontEntry.CodePoints = Map.ofArray cpMap })
+        |> Map.ofList
+
+    // horizontal separator
+    SkyLine.insert (slAtlas, irect(0, 0, srcAtlas.Width - 1, 1)) |> ignore
+
+    let iconMap =
+        srcAtlas.Icons
+        |> List.map (fun ic -> ic.SymName, compileIcon g slAtlas ropt getPath ic)
+        |> Map.ofList
+
+    let cmplAtlas   = {
+        Atlas.ImageName    = Path.GetFileName(atlasName + ".png")
+        Atlas.ImageWidth   = bmp.Width
+        Atlas.ImageHeight  = bmp.Height
+        Atlas.Fonts        = fontMap
+        Atlas.Icons        = iconMap
+        Atlas.Widgets      = Map.empty
+    }
+                      
+    bmp.Save (atlasName + ".png", Imaging.ImageFormat.Png)
+    
+    let json = Json.serialize cmplAtlas
+    use file = File.CreateText (atlasName + ".compiled.atlas")
+    file.Write (json.ToString ())

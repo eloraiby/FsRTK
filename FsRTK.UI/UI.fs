@@ -46,6 +46,43 @@ type IconEntry = {
     TCoordY    : int
 }
 
+type FontEntry = {
+    FileName   : string
+    Mode       : RenderMode
+    Size       : int
+    CodePoints : Map<int, CharInfo>
+}
+
+type WidgetState =
+    | Hot
+    | Active
+    | Normal
+    | Disabled
+
+type WidgetEntry = {
+    FileName   : string
+    Width      : int
+    Height     : int
+    TCoordX    : int
+    TCoordY    : int
+
+    V0         : int
+    V1         : int
+    H0         : int
+    H1         : int
+}
+
+type Atlas = {
+    ImageName    : string
+    ImageWidth   : int
+    ImageHeight  : int
+    Fonts        : Map<string, FontEntry>
+    Icons        : Map<string, IconEntry>
+    Widgets      : Map<string * WidgetState, WidgetEntry>
+}
+
+//------------------------------------------------------------------------------
+
 type InputReception =
     | Accept
     | Discard
