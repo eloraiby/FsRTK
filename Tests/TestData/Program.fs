@@ -44,11 +44,15 @@ let main argv =
     let jsRa = Json.serialize ra
     let rra = Json.deserialize<RecordA> jsRa
 
+    assert(ra = rra)
+
     printfn "%O\n------------------" jsRa
 
     let rb = { RecordB.A = ra; B = [| 10; 7; 3 |] }
     let jsRb = Json.serialize rb
     let rrb = Json.deserialize<RecordB> jsRb
+
+    assert(rb = rrb)
 
     printfn "%O\n------------------" jsRb
 
@@ -56,11 +60,15 @@ let main argv =
     let jsRc = Json.serialize rc
     let rrc = Json.deserialize<RecordC> jsRc
 
+    assert(rc = rrc)
+
     printfn "%O\n------------------" jsRc
 
     let a = UnionA.A
     let jsA = Json.serialize a
     let rra = Json.deserialize<UnionA> jsA
+
+    assert(a = rra)
 
     printfn "%O\n------------------" jsA
 
@@ -68,13 +76,23 @@ let main argv =
     let jsB = Json.serialize b
     let rrb = Json.deserialize<UnionA> jsB
 
+    assert(b = rrb)
+
     printfn "%O\n------------------" jsB
 
     let c = UnionA.C (11, "hello")
     let jsC = Json.serialize c
     let rrc = Json.deserialize<UnionA> jsC
 
+    assert(c = rrc)
+
     printfn "%O\n------------------" jsC
 
+    let jst = Json.serialize (111, "hhhaaa", 32.0f)
+    let rrc = Json.deserialize<int * string * single> jst
+
+    //assert(c = rrc)
+
+    printfn "%O\n------------------" jsC
 
     0 // return an integer exit code

@@ -51,6 +51,11 @@ and serializeUnion    (t: Type) (v: obj) =
     JsonValue.Record [| "`tag", JsonValue.String ucase.Name
                         "`value", JsonValue.Array (objs |> Array.map(fun o -> valueSerializer (o.GetType()) o)) |]
 
+and serializeTuple    (t: Type) (v: obj) =
+    let elements = FSharpType.GetTupleElements t
+    let objs = FSharpValue.GetTupleFields v
+    JsonValue.Record [| "`tuple", JsonValue.Array (objs |> Array.map (fun o -> valueSerializer (o.GetType()) o)) |]
+
 and valueSerializer (t: Type) (v: obj) =
     match t with
     | t when t = typeof<int>        -> serializeInt     v
@@ -61,6 +66,7 @@ and valueSerializer (t: Type) (v: obj) =
     | t when t.IsArray              -> serializeArray t v
     | t when FSharpType.IsRecord t  -> serializeRecord t v
     | t when FSharpType.IsUnion  t  -> serializeUnion t v
+    | t when FSharpType.IsTuple  t  -> serializeTuple t v
     | _ -> failwith "unimplemented"        
 
 let serialize<'T> (v: 'T) = valueSerializer typeof<'T> v
