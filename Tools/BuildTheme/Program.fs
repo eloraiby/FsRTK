@@ -24,6 +24,10 @@ open Nessos.Argu
 open FsRTK.Data
 open FsRTK.Ui
 
+open FsRTK.Math3D.Vector
+open FsRTK.Math3D.Geometry
+open FsRTK.Math3D.Matrix
+
 open AtlasBuilder
 
 type Arguments =
@@ -132,12 +136,19 @@ let main argv =
                     |> Map.toArray
                     |> Array.map(fun (s, (v0, v1, h0, h1)) -> { Source.WidgetEntry.FileName = s; V0 = v0; V1 = v1; H0 = h0; H1 = h1 }) }
 
-        // write final theme
-        use file = File.CreateText themeFile
-        theme
-        |> Json.serialize
-        |> toString
-        |> file.Write
+        do
+            // write final theme
+            use file = File.CreateText themeFile
+            theme
+            |> Json.serialize
+            |> toString
+            |> file.Write
+
+        if buildTo.Length > 0
+        then
+            let fileName, width, height = buildTo.[0]
+            use ftLib = new SharpFont.Library()
+            buildAtlas ftLib fileName (isize2(width, height)) RectangleOption.DrawBounds
 
     with e ->
         printfn "Fatal Error: %s" e.Message

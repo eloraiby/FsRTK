@@ -30,7 +30,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DocumentationFile>bin\Debug\BuildTheme.XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
-    <StartArguments>--theme test --build-to test 512 512 --add-font Fonts/DroidSans 12 antialias --add-font Fonts/DroidSans-Bold 12 antialias --add-icon white --add-widget frame 16 16 16 16</StartArguments>
+    <StartArguments>--theme test --build-to test 512 512 --add-font Fonts/DroidSans.ttf 12 anti-alias --add-font Fonts/DroidSans-Bold.ttf 12 anti-alias --add-icon white.png --add-widget frame.png 16 16 16 16</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>

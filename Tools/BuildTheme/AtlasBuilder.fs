@@ -50,6 +50,7 @@ with
     member x.Rectangle = Rectangle(x.X, x.Y, x.Width, x.Height)
 
 let getExtension str = Path.GetExtension str
+let stripDirectoryAndExtension str = Path.GetFileNameWithoutExtension str
 let toString o = o.ToString ()
 
 let compileFont (lib: SharpFont.Library)
@@ -124,29 +125,31 @@ let compileFont (lib: SharpFont.Library)
     entries
 
 let compileIcon (g: Graphics) (atlas: SkyLine.Atlas) (ropt: RectangleOption) (pt: string -> string) (icon: Source.IconEntry) =
-    let bmp         = new Bitmap(pt icon.FileName)
-    let rect        = irect(0, 0, bmp.Width + 2, bmp.Height + 2)
-    let placement   = SkyLine.insert (atlas, rect)
-    use pen         = new Pen(Color.Red)
+    try
+        use bmp         = new Bitmap(pt (icon.FileName))
+        let rect        = irect(0, 0, bmp.Width + 2, bmp.Height + 2)
+        let placement   = SkyLine.insert (atlas, rect)
+        use pen         = new Pen(Color.Red)
 
-    match placement with
-    | Some rect ->
-        g.DrawImageUnscaled(bmp, rect.X + 1, rect.Y + 1)
+        match placement with
+        | Some rect ->
+            g.DrawImageUnscaled(bmp, rect.X + 1, rect.Y + 1)
 
-        match ropt with
-        | DrawBounds -> g.DrawRectangle(pen, rect.Rectangle)
-        | NoBounds   -> ()
+            match ropt with
+            | DrawBounds -> g.DrawRectangle(pen, rect.Rectangle)
+            | NoBounds   -> ()
 
-        { Ui.IconEntry.FileName   = icon.FileName
-          Ui.IconEntry.Width      = bmp.Width
-          Ui.IconEntry.Height     = bmp.Height
-          Ui.IconEntry.TCoordX    = rect.X + 1
-          Ui.IconEntry.TCoordY    = rect.Y + 1 }
-    | None -> failwith "not enough space"
+            { Ui.IconEntry.Name       = stripDirectoryAndExtension icon.FileName
+              Ui.IconEntry.Width      = bmp.Width
+              Ui.IconEntry.Height     = bmp.Height
+              Ui.IconEntry.TCoordX    = rect.X + 1
+              Ui.IconEntry.TCoordY    = rect.Y + 1 }
+        | None -> failwith "not enough space"
+    with e ->
+        failwith (sprintf "%s.png not found" icon.FileName)
 
 let buildAtlas (ftLib: SharpFont.Library) (themeName: string) (size: isize2) (ropt: RectangleOption) =
     let themeFile = if getExtension themeName = ".theme" then themeName else themeName + ".theme"
-    let stripExtension = Path.GetFileNameWithoutExtension
 
     let getPath (p: string) =
         if Path.IsPathRooted p
@@ -179,11 +182,11 @@ let buildAtlas (ftLib: SharpFont.Library) (themeName: string) (size: isize2) (ro
                 let fontName    = getPath f.FileName
                 use face = ftLib.NewFace (fontName, 0)
                 let cpMap   = compileFont ftLib face f.Mode f.Size g ropt slAtlas cps
-                (sprintf "%s-%O-%O" f.FileName f.Mode f.Size)
-                , { FontEntry.FileName   = f.FileName
+                (sprintf "%s-%O-%O" (stripDirectoryAndExtension f.FileName) f.Mode f.Size)
+                , { FontEntry.Name       = f.FileName
                     FontEntry.Mode       = f.Mode
                     FontEntry.Size       = f.Size
-                    FontEntry.CodePoints = Map.ofArray cpMap })
+                    FontEntry.CodePoints = cpMap })
         |> Map.ofArray
 
     // horizontal separator
@@ -191,20 +194,20 @@ let buildAtlas (ftLib: SharpFont.Library) (themeName: string) (size: isize2) (ro
 
     let iconMap =
         srcAtlas.Icons
-        |> Array.map (fun ic -> ic.FileName, compileIcon g slAtlas ropt getPath ic)
+        |> Array.map (fun ic -> (stripDirectoryAndExtension ic.FileName), compileIcon g slAtlas ropt getPath ic)
         |> Map.ofArray
 
     let cmplAtlas   = {
-        Atlas.ImageName    = Path.GetFileName ((stripExtension themeFile) + ".png")
+        Atlas.ImageName    = Path.GetFileName ((stripDirectoryAndExtension themeFile) + ".png")
         Atlas.ImageWidth   = bmp.Width
         Atlas.ImageHeight  = bmp.Height
-        Atlas.Fonts        = fontMap
-        Atlas.Icons        = iconMap
-        Atlas.Widgets      = Map.empty
+        Atlas.Fonts        = fontMap |> Map.toArray
+        Atlas.Icons        = iconMap |> Map.toArray
+        Atlas.Widgets      = Map.empty |> Map.toArray
     }
                       
-    bmp.Save ((stripExtension themeFile) + ".png", Imaging.ImageFormat.Png)
+    bmp.Save ((stripDirectoryAndExtension themeFile) + ".png", Imaging.ImageFormat.Png)
     
     let json = Json.serialize cmplAtlas
-    use file = File.CreateText ((stripExtension themeFile) + ".atlas")
+    use file = File.CreateText ((stripDirectoryAndExtension themeFile) + ".atlas")
     file.Write (json.ToString ())

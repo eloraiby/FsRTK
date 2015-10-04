@@ -48,8 +48,8 @@ and serializeRecord   (t: Type) (v: obj) =
 and serializeUnion    (t: Type) (v: obj) =
     let cases = FSharpType.GetUnionCases t
     let ucase, objs = FSharpValue.GetUnionFields (v, t)
-    JsonValue.Record [| "`tag", JsonValue.String ucase.Name
-                        "`value", JsonValue.Array (objs |> Array.map(fun o -> valueSerializer (o.GetType()) o)) |]
+    JsonValue.Record [| ucase.Name
+                        , JsonValue.Array (objs |> Array.map(fun o -> valueSerializer (o.GetType()) o)) |]
 
 and serializeTuple    (t: Type) (v: obj) =
     let elements = FSharpType.GetTupleElements t
@@ -99,8 +99,14 @@ and deserializeRecord   (t: Type) (v: JsonValue) =
     FSharpValue.MakeRecord(t, fields)
 
 and deserializeUnion    (t: Type) (v: JsonValue) =
-    let jsonFields = match v with | JsonValue.Record r -> r |> Map.ofArray | _ -> failwith "attempt to deserialize a non Json Union into a Union"
-    let tag = deserializeString jsonFields.["`tag"]
+    let tag, value =
+        match v with
+        | JsonValue.Record r ->
+            if r.Length <> 1
+            then failwith "unions can only have 1 record"
+            else r.[0]
+        | _ -> failwith "attempt to deserialize a non Json Union into a Union"
+    
     let case =
         FSharpType.GetUnionCases t
         |> Array.map (fun ci -> ci.Name, ci)
@@ -108,7 +114,7 @@ and deserializeUnion    (t: Type) (v: JsonValue) =
         |> Map.find tag
 
     let jsValues =
-        match jsonFields.["`value"] with
+        match value with
         | JsonValue.Array arr -> arr
         | _ -> failwith "value for union case should be an array"
 

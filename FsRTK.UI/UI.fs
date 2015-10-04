@@ -40,15 +40,16 @@ type FontRenderMode =
 with
     override x.ToString() =
         match x with
-        | AntiAlias -> "antialias"
+        | AntiAlias -> "anti-alias"
         | Mono      -> "mono"
     static member parse str =
         match str with
-        | "antialias" -> AntiAlias
+        | "anti-alias" -> AntiAlias
         | "mono"      -> Mono 
+        | _ -> failwith "invalid FontRenderMode case to parse"
 
 type IconEntry = {
-    FileName   : string
+    Name       : string
     Width      : int
     Height     : int
     TCoordX    : int
@@ -56,10 +57,10 @@ type IconEntry = {
 }
 
 type FontEntry = {
-    FileName   : string
+    Name       : string
     Mode       : FontRenderMode
     Size       : int
-    CodePoints : Map<int, CharInfo>
+    CodePoints : (int * CharInfo) []
 }
 
 type WidgetState =
@@ -69,7 +70,7 @@ type WidgetState =
     | Disabled
 
 type WidgetEntry = {
-    FileName   : string
+    Name       : string
     Width      : int
     Height     : int
     TCoordX    : int
@@ -85,9 +86,9 @@ type Atlas = {
     ImageName    : string
     ImageWidth   : int
     ImageHeight  : int
-    Fonts        : Map<string, FontEntry>
-    Icons        : Map<string, IconEntry>
-    Widgets      : Map<string * WidgetState, WidgetEntry>
+    Fonts        : (string * FontEntry)[]
+    Icons        : (string * IconEntry)[]
+    Widgets      : ((string * WidgetState) * WidgetEntry)[]
 }
 
 //------------------------------------------------------------------------------
