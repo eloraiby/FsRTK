@@ -23,8 +23,7 @@ module Source =
     type FontEntry  = {
         FileName    : string
         Size        : int
-        Mode        : RenderMode
-        CodePoints  : int[]
+        Mode        : FontRenderMode
     }
 
     type IconEntry  = {
@@ -39,57 +38,23 @@ module Source =
         H1          : int
     }
 
-    type Atlas  = {
-        Width       : int
-        Height      : int
+    type Theme  = {
         Fonts       : FontEntry[]
         Icons       : IconEntry[]
         Widgets     : WidgetEntry[]
     } with
-        static member empty() = { Width = 0; Height = 0; Fonts = [||]; Icons = [||]; Widgets = [||] }
+        static member empty() = { Fonts = [||]; Icons = [||]; Widgets = [||] }
 
 type irect
 with
     member x.Rectangle = Rectangle(x.X, x.Y, x.Width, x.Height)
 
-let sourceExample () =
-    let cps =
-        "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM,./;'[]\\1234567890`-=~!@#$%^&*()_+{}|:<>?\" "
-        |> Seq.map(fun x -> x |> int)
-        |> Array.ofSeq
-
-    let atlas = {
-        Source.Atlas.Width  = 512
-        Source.Atlas.Height = 512
-        Source.Atlas.Fonts  =
-            [|{ Source.FontEntry.FileName = "DroidSans"
-                Source.FontEntry.Size     = 12
-                Source.FontEntry.Mode     = RenderMode.AntiAlias
-                Source.FontEntry.CodePoints   = cps }
-
-              { Source.FontEntry.FileName = "DroidSans"
-                Source.FontEntry.Size     = 14
-                Source.FontEntry.Mode     = RenderMode.Mono
-                Source.FontEntry.CodePoints   = cps.Clone() :?> _ }   |]
-
-        Source.Atlas.Icons  =
-             [|
-                 { Source.IconEntry.FileName = "white"         }
-                 { Source.IconEntry.FileName = "folder-open"   }
-                 { Source.IconEntry.FileName = "folder-music"  }
-                 { Source.IconEntry.FileName = "folder-videos" }
-             |]
-        Source.Atlas.Widgets = [||]
-    }
-    
-    use file    = File.CreateText ("example.source.atlas")
-    let json    = Json.serialize atlas
-    file.Write (json.ToString ())
-
+let getExtension str = Path.GetExtension str
+let toString o = o.ToString ()
 
 let compileFont (lib: SharpFont.Library)
                 (f: Face)
-                (rm: Ui.RenderMode)
+                (rm: Ui.FontRenderMode)
                 (size: int)
                 (g: Graphics)
                 (ropt: RectangleOption)
@@ -106,8 +71,8 @@ let compileFont (lib: SharpFont.Library)
                 
                 let rm =
                     match rm with
-                    | Ui.RenderMode.AntiAlias -> SharpFont.RenderMode.Normal
-                    | Ui.RenderMode.Mono      -> SharpFont.RenderMode.Mono
+                    | Ui.FontRenderMode.AntiAlias -> SharpFont.RenderMode.Normal
+                    | Ui.FontRenderMode.Mono      -> SharpFont.RenderMode.Mono
 
                 f.Glyph.RenderGlyph(rm)
 
@@ -179,27 +144,33 @@ let compileIcon (g: Graphics) (atlas: SkyLine.Atlas) (ropt: RectangleOption) (pt
           Ui.IconEntry.TCoordY    = rect.Y + 1 }
     | None -> failwith "not enough space"
 
-let buildAtlas (ftLib: SharpFont.Library) (atlasName: string) (ropt: RectangleOption) =
+let buildAtlas (ftLib: SharpFont.Library) (themeName: string) (size: isize2) (ropt: RectangleOption) =
+    let themeFile = if getExtension themeName = ".theme" then themeName else themeName + ".theme"
+    let stripExtension = Path.GetFileNameWithoutExtension
 
     let getPath (p: string) =
         if Path.IsPathRooted p
         then p
-        else Path.Combine (Path.GetDirectoryName atlasName, p)
+        else Path.Combine (Path.GetDirectoryName themeFile, p)
 
     let srcAtlas =
         let readAtlas () =
-            use file = File.OpenText (atlasName + ".source.atlas")
+            use file = File.OpenText themeFile
             let json = JsonValue.Parse (file.ReadToEnd ())
-            Json.deserialize<Source.Atlas> json
+            Json.deserialize<Source.Theme> json
         readAtlas()
 
-    use tmpBmp = new Bitmap(srcAtlas.Width, srcAtlas.Height, Imaging.PixelFormat.Format32bppArgb)
+    use tmpBmp = new Bitmap(size.width, size.height, Imaging.PixelFormat.Format32bppArgb)
     let bmp = tmpBmp :> Image
     use g = Graphics.FromImage bmp
 
-    g.FillRectangle(Brushes.Transparent, 0, 0, srcAtlas.Width, srcAtlas.Height)
+    g.FillRectangle(Brushes.Transparent, 0, 0, size.width, size.height)
     
-    let slAtlas = SkyLine.Atlas.init(srcAtlas.Width, srcAtlas.Height)
+    let slAtlas = SkyLine.Atlas.init(size.width, size.height)
+    let cps =
+        "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM,./;'[]\\1234567890`-=~!@#$%^&*()_+{}|:<>?\" "
+        |> Seq.map(fun x -> x |> int)
+        |> Array.ofSeq
 
     let fontMap =
         srcAtlas.Fonts
@@ -207,7 +178,7 @@ let buildAtlas (ftLib: SharpFont.Library) (atlasName: string) (ropt: RectangleOp
             (fun f ->
                 let fontName    = getPath f.FileName
                 use face = ftLib.NewFace (fontName, 0)
-                let cpMap   = compileFont ftLib face f.Mode f.Size g ropt slAtlas f.CodePoints
+                let cpMap   = compileFont ftLib face f.Mode f.Size g ropt slAtlas cps
                 (sprintf "%s-%O-%O" f.FileName f.Mode f.Size)
                 , { FontEntry.FileName   = f.FileName
                     FontEntry.Mode       = f.Mode
@@ -216,7 +187,7 @@ let buildAtlas (ftLib: SharpFont.Library) (atlasName: string) (ropt: RectangleOp
         |> Map.ofArray
 
     // horizontal separator
-    SkyLine.insert (slAtlas, irect(0, 0, srcAtlas.Width - 1, 1)) |> ignore
+    SkyLine.insert (slAtlas, irect(0, 0, size.width - 1, 1)) |> ignore
 
     let iconMap =
         srcAtlas.Icons
@@ -224,7 +195,7 @@ let buildAtlas (ftLib: SharpFont.Library) (atlasName: string) (ropt: RectangleOp
         |> Map.ofArray
 
     let cmplAtlas   = {
-        Atlas.ImageName    = Path.GetFileName(atlasName + ".png")
+        Atlas.ImageName    = Path.GetFileName ((stripExtension themeFile) + ".png")
         Atlas.ImageWidth   = bmp.Width
         Atlas.ImageHeight  = bmp.Height
         Atlas.Fonts        = fontMap
@@ -232,8 +203,8 @@ let buildAtlas (ftLib: SharpFont.Library) (atlasName: string) (ropt: RectangleOp
         Atlas.Widgets      = Map.empty
     }
                       
-    bmp.Save (atlasName + ".png", Imaging.ImageFormat.Png)
+    bmp.Save ((stripExtension themeFile) + ".png", Imaging.ImageFormat.Png)
     
     let json = Json.serialize cmplAtlas
-    use file = File.CreateText (atlasName + ".compiled.atlas")
+    use file = File.CreateText ((stripExtension themeFile) + ".atlas")
     file.Write (json.ToString ())

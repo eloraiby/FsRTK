@@ -34,7 +34,7 @@ type CharInfo = {
     TCoordY   : int
 }
 
-type RenderMode =
+type FontRenderMode =
     | AntiAlias
     | Mono
 with
@@ -42,6 +42,10 @@ with
         match x with
         | AntiAlias -> "antialias"
         | Mono      -> "mono"
+    static member parse str =
+        match str with
+        | "antialias" -> AntiAlias
+        | "mono"      -> Mono 
 
 type IconEntry = {
     FileName   : string
@@ -53,7 +57,7 @@ type IconEntry = {
 
 type FontEntry = {
     FileName   : string
-    Mode       : RenderMode
+    Mode       : FontRenderMode
     Size       : int
     CodePoints : Map<int, CharInfo>
 }
