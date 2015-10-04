@@ -22,7 +22,6 @@ type RectangleOption =
 module Source =
     type FontEntry  = {
         FileName    : string
-        SymName     : string
         Size        : int
         Mode        : RenderMode
         CodePoints  : int[]
@@ -30,15 +29,24 @@ module Source =
 
     type IconEntry  = {
         FileName    : string
-        SymName     : string
+    }
+
+    type WidgetEntry = {
+        FileName    : string
+        V0          : int
+        V1          : int
+        H0          : int
+        H1          : int
     }
 
     type Atlas  = {
         Width       : int
         Height      : int
-        Fonts       : FontEntry list
-        Icons       : IconEntry list
-    }
+        Fonts       : FontEntry[]
+        Icons       : IconEntry[]
+        Widgets     : WidgetEntry[]
+    } with
+        static member empty() = { Width = 0; Height = 0; Fonts = [||]; Icons = [||]; Widgets = [||] }
 
 type irect
 with
@@ -54,25 +62,24 @@ let sourceExample () =
         Source.Atlas.Width  = 512
         Source.Atlas.Height = 512
         Source.Atlas.Fonts  =
-            [ { Source.FontEntry.FileName = "DroidSans.ttf"
-                Source.FontEntry.SymName  = "droid-sans.12.aa"
+            [|{ Source.FontEntry.FileName = "DroidSans"
                 Source.FontEntry.Size     = 12
                 Source.FontEntry.Mode     = RenderMode.AntiAlias
                 Source.FontEntry.CodePoints   = cps }
 
-              { Source.FontEntry.FileName = "DroidSans.ttf"
-                Source.FontEntry.SymName  = "droid-sans.14.m"
+              { Source.FontEntry.FileName = "DroidSans"
                 Source.FontEntry.Size     = 14
                 Source.FontEntry.Mode     = RenderMode.Mono
-                Source.FontEntry.CodePoints   = cps.Clone() :?> _ }   ]
+                Source.FontEntry.CodePoints   = cps.Clone() :?> _ }   |]
 
         Source.Atlas.Icons  =
-             [
-                 { Source.IconEntry.FileName = "white.png"         ; Source.IconEntry.SymName = "white" }
-                 { Source.IconEntry.FileName = "folder-open.png"   ; Source.IconEntry.SymName = "folder-open" }
-                 { Source.IconEntry.FileName = "folder-music.png"  ; Source.IconEntry.SymName = "folder-music" }
-                 { Source.IconEntry.FileName = "folder-videos.png" ; Source.IconEntry.SymName = "folder-videos" }
-             ]
+             [|
+                 { Source.IconEntry.FileName = "white"         }
+                 { Source.IconEntry.FileName = "folder-open"   }
+                 { Source.IconEntry.FileName = "folder-music"  }
+                 { Source.IconEntry.FileName = "folder-videos" }
+             |]
+        Source.Atlas.Widgets = [||]
     }
     
     use file    = File.CreateText ("example.source.atlas")
@@ -196,25 +203,25 @@ let buildAtlas (ftLib: SharpFont.Library) (atlasName: string) (ropt: RectangleOp
 
     let fontMap =
         srcAtlas.Fonts
-        |> List.map
+        |> Array.map
             (fun f ->
                 let fontName    = getPath f.FileName
                 use face = ftLib.NewFace (fontName, 0)
                 let cpMap   = compileFont ftLib face f.Mode f.Size g ropt slAtlas f.CodePoints
-                f.SymName
+                (sprintf "%s-%O-%O" f.FileName f.Mode f.Size)
                 , { FontEntry.FileName   = f.FileName
                     FontEntry.Mode       = f.Mode
                     FontEntry.Size       = f.Size
                     FontEntry.CodePoints = Map.ofArray cpMap })
-        |> Map.ofList
+        |> Map.ofArray
 
     // horizontal separator
     SkyLine.insert (slAtlas, irect(0, 0, srcAtlas.Width - 1, 1)) |> ignore
 
     let iconMap =
         srcAtlas.Icons
-        |> List.map (fun ic -> ic.SymName, compileIcon g slAtlas ropt getPath ic)
-        |> Map.ofList
+        |> Array.map (fun ic -> ic.FileName, compileIcon g slAtlas ropt getPath ic)
+        |> Map.ofArray
 
     let cmplAtlas   = {
         Atlas.ImageName    = Path.GetFileName(atlasName + ".png")

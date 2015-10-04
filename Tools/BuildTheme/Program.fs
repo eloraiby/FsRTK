@@ -17,22 +17,23 @@
 *)
 
 open System
+open System.IO
+
 open Nessos.Argu
 
-type FontMode =
-    | Mono
-    | Anti_Alias
+open FsRTK.Data
+open FsRTK.Ui
 
 type Arguments =
     | [<PrintLabels>]
-      [<Mandatory>]   Theme         of theme: string
-    | [<PrintLabels>] Add_Icon      of icon: string
-    | [<PrintLabels>] Remove_Icon   of icon: string
+      [<Mandatory>]   Theme         of theme : string
+    | [<PrintLabels>] Add_Icon      of icon  : string
+    | [<PrintLabels>] Remove_Icon   of icon  : string
     | [<PrintLabels>] Add_Widget    of widget: string * v0: int * v1: int * h0: int * h1: int
     | [<PrintLabels>] Remove_Widget of widget: string
-    | [<PrintLabels>] Add_Font      of font: string * size: int * mode: string
-    | [<PrintLabels>] Remove_Font   of font: string
-    | [<PrintLabels>] Build_To      of atlas: string
+    | [<PrintLabels>] Add_Font      of font  : string * size: int * mode: string
+    | [<PrintLabels>] Remove_Font   of font  : string * size: int * mode: string
+    | [<PrintLabels>] Build_To      of atlas : string
 
 with
     interface IArgParserTemplate with
@@ -58,20 +59,46 @@ let main argv =
         let theme           = values.GetResults <@ Theme         @> |> Set.ofList |> Set.toArray
         let addIcon         = values.GetResults <@ Add_Icon      @> |> Set.ofList
         let removeIcon      = values.GetResults <@ Remove_Icon   @> |> Set.ofList
-        let addWidget       = values.GetResults <@ Add_Widget    @> |> Set.ofList
+        let addWidget       = values.GetResults <@ Add_Widget    @> |> List.map (fun (str, v0, v1, h0, h1) -> str, (v0, v1, h0, h1)) |> Map.ofList
         let removeWidget    = values.GetResults <@ Remove_Widget @> |> Set.ofList
         let addFont         = values.GetResults <@ Add_Font      @> |> Set.ofList
         let removeFont      = values.GetResults <@ Remove_Font   @> |> Set.ofList
-        let buildTo         = values.GetResults <@ Build_To      @> |> Set.ofList
+        let buildTo         = values.GetResults <@ Build_To      @> |> Set.ofList |> Set.toArray
 
         if theme.Length > 1
         then failwith (sprintf "you can have only 1 theme file, got: %d\nUsage:\n%s" theme.Length usage)
-            
-        let iconsToAdd      = Set.intersect addIcon removeIcon  |> Set.toArray
+ 
+        if buildTo.Length > 1
+        then failwith (sprintf "you can have only 1 output atlas file, got: %d\nUsage:\n%s" buildTo.Length usage)
+           
+        let iconsToAdd      = Set.difference addIcon removeIcon |> Set.toArray
         let iconsToRemove   = removeIcon                        |> Set.toArray
 
+        let widgetsToAdd    = addWidget                         |> Map.filter (fun k v -> not (removeWidget.Contains k)) |> Map.toArray
+        let widgetsToRemove = removeWidget                      |> Set.toArray
+
+        let fontsToAdd      = Set.difference addFont removeFont |> Set.toArray
+        let fontsToRemove   = removeFont                        |> Set.toArray
 
         printfn "Theme file: %s" theme.[0]
+
+        let jsonStr =
+            try
+                use file = File.OpenText theme.[0]
+                file.ReadToEnd ()
+
+            with e ->
+                printfn "%s does not exist, creating a new theme file" theme.[0]
+                use file = File.CreateText theme.[0]
+
+                let atlas = (AtlasBuilder.Source.Atlas.empty ()).ToString ()
+                file.Write atlas
+                atlas
+            |> JsonValue.Parse
+            
+        let atlas = Json.deserialize<AtlasBuilder.Source.Atlas> jsonStr
+        printfn "%A" atlas
+
 
     with e ->
         printfn "Fatal Error: %s" e.Message

@@ -37,6 +37,11 @@ type CharInfo = {
 type RenderMode =
     | AntiAlias
     | Mono
+with
+    override x.ToString() =
+        match x with
+        | AntiAlias -> "antialias"
+        | Mono      -> "mono"
 
 type IconEntry = {
     FileName   : string
