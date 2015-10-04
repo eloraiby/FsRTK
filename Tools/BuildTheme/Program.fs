@@ -40,6 +40,7 @@ type Arguments =
     | [<PrintLabels>] Add_Font      of font  : string * size: int * mode: string
     | [<PrintLabels>] Remove_Font   of font  : string * size: int * mode: string
     | [<PrintLabels>] Build_To      of atlas : string * width: int * height: int
+    | Draw_Bounds
 
 with
     interface IArgParserTemplate with
@@ -50,9 +51,10 @@ with
             | Remove_Icon   _ -> "remove the specified icon from the theme configuration file"
             | Add_Widget    _ -> "add the specified widget to the theme configuration file"
             | Remove_Widget _ -> "remove the specified widget from the theme configuration file (v0: vertical line 0, v1: vertical line 1, h0: horizontal line 0, h1: horizontal line 1)"
-            | Add_Font      _ -> "add the specified font to the theme configuration file (mode: either mono or anti-alias)"
+            | Add_Font      _ -> "add the specified font to the theme configuration file (mode: either mono or antialias)"
             | Remove_Font   _ -> "remove the specified font from the theme configuration file"
             | Build_To      _ -> "build to the atlas file"
+            | Draw_Bounds     -> "draw a bounding box around each tile in the atlas"
 
 let argParser = ArgumentParser.Create<Arguments> ()
        
@@ -70,6 +72,7 @@ let main argv =
         let addFont         = values.GetResults <@ Add_Font      @> |> Set.ofList
         let fontsToRemove   = values.GetResults <@ Remove_Font   @> |> Set.ofList
         let buildTo         = values.GetResults <@ Build_To      @> |> Set.ofList |> Set.toArray
+        let drawBounds      = values.GetResults <@ Draw_Bounds   @> |> function | [] -> false | h :: [] -> true | _ -> failwith "only one draw-bounds is allowed"
 
         if theme.Length > 1
         then failwith (sprintf "you can have only 1 theme file, got: %d\nUsage:\n%s" theme.Length usage)
@@ -146,9 +149,10 @@ let main argv =
 
         if buildTo.Length > 0
         then
+            let drawBounds = if drawBounds then RectangleOption.DrawBounds else RectangleOption.NoBounds 
             let fileName, width, height = buildTo.[0]
             use ftLib = new SharpFont.Library()
-            buildAtlas ftLib fileName (isize2(width, height)) RectangleOption.DrawBounds
+            buildAtlas ftLib fileName (isize2(width, height)) drawBounds
 
     with e ->
         printfn "Fatal Error: %s" e.Message

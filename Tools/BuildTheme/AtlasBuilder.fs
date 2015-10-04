@@ -139,14 +139,40 @@ let compileIcon (g: Graphics) (atlas: SkyLine.Atlas) (ropt: RectangleOption) (pt
             | DrawBounds -> g.DrawRectangle(pen, rect.Rectangle)
             | NoBounds   -> ()
 
-            { Ui.IconEntry.Name       = stripDirectoryAndExtension icon.FileName
-              Ui.IconEntry.Width      = bmp.Width
+            { Ui.IconEntry.Width      = bmp.Width
               Ui.IconEntry.Height     = bmp.Height
               Ui.IconEntry.TCoordX    = rect.X + 1
               Ui.IconEntry.TCoordY    = rect.Y + 1 }
         | None -> failwith "not enough space"
     with e ->
         failwith (sprintf "%s.png not found" icon.FileName)
+
+let compileWidget (g: Graphics) (atlas: SkyLine.Atlas) (ropt: RectangleOption) (pt: string -> string) (widget: Source.WidgetEntry) =
+    try
+        use bmp         = new Bitmap(pt (widget.FileName))
+        let rect        = irect(0, 0, bmp.Width + 2, bmp.Height + 2)
+        let placement   = SkyLine.insert (atlas, rect)
+        use pen         = new Pen(Color.Red)
+
+        match placement with
+        | Some rect ->
+            g.DrawImageUnscaled(bmp, rect.X + 1, rect.Y + 1)
+
+            match ropt with
+            | DrawBounds -> g.DrawRectangle(pen, rect.Rectangle)
+            | NoBounds   -> ()
+
+            { Ui.WidgetEntry.Width      = bmp.Width
+              Ui.WidgetEntry.Height     = bmp.Height
+              Ui.WidgetEntry.TCoordX    = rect.X + 1
+              Ui.WidgetEntry.TCoordY    = rect.Y + 1
+              Ui.WidgetEntry.V0         = widget.V0
+              Ui.WidgetEntry.V1         = widget.V1
+              Ui.WidgetEntry.H0         = widget.H0
+              Ui.WidgetEntry.H1         = widget.H1 }
+        | None -> failwith "not enough space"
+    with e ->
+        failwith (sprintf "%s.png not found" widget.FileName)
 
 let buildAtlas (ftLib: SharpFont.Library) (themeName: string) (size: isize2) (ropt: RectangleOption) =
     let themeFile = if getExtension themeName = ".theme" then themeName else themeName + ".theme"
@@ -183,11 +209,9 @@ let buildAtlas (ftLib: SharpFont.Library) (themeName: string) (size: isize2) (ro
                 use face = ftLib.NewFace (fontName, 0)
                 let cpMap   = compileFont ftLib face f.Mode f.Size g ropt slAtlas cps
                 (sprintf "%s-%O-%O" (stripDirectoryAndExtension f.FileName) f.Mode f.Size)
-                , { FontEntry.Name       = f.FileName
-                    FontEntry.Mode       = f.Mode
+                , { FontEntry.Mode       = f.Mode
                     FontEntry.Size       = f.Size
                     FontEntry.CodePoints = cpMap })
-        |> Map.ofArray
 
     // horizontal separator
     SkyLine.insert (slAtlas, irect(0, 0, size.width - 1, 1)) |> ignore
@@ -195,15 +219,26 @@ let buildAtlas (ftLib: SharpFont.Library) (themeName: string) (size: isize2) (ro
     let iconMap =
         srcAtlas.Icons
         |> Array.map (fun ic -> (stripDirectoryAndExtension ic.FileName), compileIcon g slAtlas ropt getPath ic)
-        |> Map.ofArray
+
+    // horizontal separator
+    SkyLine.insert (slAtlas, irect(0, 0, size.width - 1, 1)) |> ignore
+
+    let widgetMap =
+        srcAtlas.Widgets
+        |> Array.map (fun w ->
+            let name = stripDirectoryAndExtension w.FileName
+            let state = WidgetState.parse (Path.GetExtension name)
+            let name = stripDirectoryAndExtension name
+
+            (name, state), compileWidget g slAtlas ropt getPath w)
 
     let cmplAtlas   = {
         Atlas.ImageName    = Path.GetFileName ((stripDirectoryAndExtension themeFile) + ".png")
         Atlas.ImageWidth   = bmp.Width
         Atlas.ImageHeight  = bmp.Height
-        Atlas.Fonts        = fontMap |> Map.toArray
-        Atlas.Icons        = iconMap |> Map.toArray
-        Atlas.Widgets      = Map.empty |> Map.toArray
+        Atlas.Fonts        = fontMap   
+        Atlas.Icons        = iconMap   
+        Atlas.Widgets      = widgetMap 
     }
                       
     bmp.Save ((stripDirectoryAndExtension themeFile) + ".png", Imaging.ImageFormat.Png)

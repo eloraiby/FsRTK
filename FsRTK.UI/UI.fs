@@ -40,16 +40,15 @@ type FontRenderMode =
 with
     override x.ToString() =
         match x with
-        | AntiAlias -> "anti-alias"
+        | AntiAlias -> "antialias"
         | Mono      -> "mono"
     static member parse str =
         match str with
-        | "anti-alias" -> AntiAlias
+        | "antialias" -> AntiAlias
         | "mono"      -> Mono 
         | _ -> failwith "invalid FontRenderMode case to parse"
 
 type IconEntry = {
-    Name       : string
     Width      : int
     Height     : int
     TCoordX    : int
@@ -57,7 +56,6 @@ type IconEntry = {
 }
 
 type FontEntry = {
-    Name       : string
     Mode       : FontRenderMode
     Size       : int
     CodePoints : (int * CharInfo) []
@@ -68,9 +66,16 @@ type WidgetState =
     | Active
     | Normal
     | Disabled
+with
+    static member parse str =
+        match str with
+        | ".hot"        -> Hot
+        | ".active"     -> Active
+        | ".normal"     -> Normal
+        | ".disabled"   -> Disabled
+        | _ -> failwith "invalid WidgetState case to parse"
 
 type WidgetEntry = {
-    Name       : string
     Width      : int
     Height     : int
     TCoordX    : int
