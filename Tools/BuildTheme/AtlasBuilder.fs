@@ -14,6 +14,7 @@ open FsRTK.Math3D.Geometry
 
 open FsRTK.Algorithms
 
+open FsRTK.Ui.Base
 open FsRTK.Ui.Widgets
 open FsRTK.Ui.Theme
 
@@ -142,10 +143,10 @@ let compileIcon (g: Graphics) (atlas: SkyLine.Atlas) (ropt: RectangleOption) (pt
             | DrawBounds -> g.DrawRectangle(pen, rect.Rectangle)
             | NoBounds   -> ()
 
-            { IconEntry.Width      = bmp.Width
-              IconEntry.Height     = bmp.Height
-              IconEntry.TCoordX    = rect.X + 1
-              IconEntry.TCoordY    = rect.Y + 1 }
+            { File.IconEntry.Width      = bmp.Width
+              File.IconEntry.Height     = bmp.Height
+              File.IconEntry.TCoordX    = rect.X + 1
+              File.IconEntry.TCoordY    = rect.Y + 1 }
         | None -> failwith "not enough space"
     with e ->
         failwith (sprintf "%s.png not found" icon.FileName)
@@ -165,14 +166,14 @@ let compileWidget (g: Graphics) (atlas: SkyLine.Atlas) (ropt: RectangleOption) (
             | DrawBounds -> g.DrawRectangle(pen, rect.Rectangle)
             | NoBounds   -> ()
 
-            { WidgetEntry.Width      = bmp.Width
-              WidgetEntry.Height     = bmp.Height
-              WidgetEntry.TCoordX    = rect.X + 1
-              WidgetEntry.TCoordY    = rect.Y + 1
-              WidgetEntry.V0         = widget.V0
-              WidgetEntry.V1         = widget.V1
-              WidgetEntry.H0         = widget.H0
-              WidgetEntry.H1         = widget.H1 }
+            { File.WidgetEntry.Width      = bmp.Width
+              File.WidgetEntry.Height     = bmp.Height
+              File.WidgetEntry.TCoordX    = rect.X + 1
+              File.WidgetEntry.TCoordY    = rect.Y + 1
+              File.WidgetEntry.V0         = widget.V0
+              File.WidgetEntry.V1         = widget.V1
+              File.WidgetEntry.H0         = widget.H0
+              File.WidgetEntry.H1         = widget.H1 }
         | None -> failwith "not enough space"
     with e ->
         failwith (sprintf "%s.png not found" widget.FileName)
