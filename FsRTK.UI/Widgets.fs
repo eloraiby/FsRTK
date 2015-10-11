@@ -23,6 +23,8 @@ open FsRTK.Math3D.Vector
 open FsRTK.Math3D.Matrix
 open FsRTK.Math3D.Geometry
 
+open FsRTK.Ui.Base
+
 type InputReception =
     | Accept
     | Discard
@@ -32,13 +34,6 @@ type Slider = {
     Max : single
     Val : single
 }
-
-type Font =
-    | Application   // Application general font
-    | Title         // frame title font
-    | Icon          // icon text font
-    | Mono          // mono space font
-    | Custom    of string
 
 type Layout = {
     Widgets : Widget []
@@ -93,6 +88,21 @@ type Frame = {
 
     Layout      : Layout
 }
+
+type WidgetState =
+    | Hot
+    | Active
+    | Normal
+    | Disabled
+with
+    static member parse str =
+        match str with
+        | ".hot"        -> Hot
+        | ".active"     -> Active
+        | ".normal"     -> Normal
+        | ".disabled"   -> Disabled
+        | _ -> failwith "invalid WidgetState case to parse"
+
 
 type Widget
 with

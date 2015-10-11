@@ -23,73 +23,34 @@ open FsRTK.Math3D.Vector
 open FsRTK.Math3D.Matrix
 open FsRTK.Math3D.Geometry
 
+open FsRTK.Ui.Base
 open FsRTK.Ui.Widgets
 
-
-type CharInfo = {
-    AdvanceX  : int
-    AdvanceY  : int
-    Width     : int
-    Height    : int
-    Left      : int
-    Top       : int
-    TCoordX   : int
-    TCoordY   : int
-}
-
-type FontRenderMode =
-    | AntiAlias
-    | Mono
-with
-    override x.ToString() =
-        match x with
-        | AntiAlias -> "antialias"
-        | Mono      -> "mono"
-    static member parse str =
-        match str with
-        | "antialias" -> AntiAlias
-        | "mono"      -> Mono 
-        | _ -> failwith "invalid FontRenderMode case to parse"
-
-type IconEntry = {
-    Width      : int
-    Height     : int
-    TCoordX    : int
-    TCoordY    : int
-}
-
-
-type WidgetState =
-    | Hot
-    | Active
-    | Normal
-    | Disabled
-with
-    static member parse str =
-        match str with
-        | ".hot"        -> Hot
-        | ".active"     -> Active
-        | ".normal"     -> Normal
-        | ".disabled"   -> Disabled
-        | _ -> failwith "invalid WidgetState case to parse"
-
-type WidgetEntry = {
-    Width      : int
-    Height     : int
-    TCoordX    : int
-    TCoordY    : int
-
-    V0         : int
-    V1         : int
-    H0         : int
-    H1         : int
-}
 
 module File =
     type FontEntry = {
         Mode       : FontRenderMode
         Size       : int
         CodePoints : (int * CharInfo) []
+    }
+
+    type IconEntry = {
+        Width      : int
+        Height     : int
+        TCoordX    : int
+        TCoordY    : int
+    }
+
+    type WidgetEntry = {
+        Width      : int
+        Height     : int
+        TCoordX    : int
+        TCoordY    : int
+
+        V0         : int
+        V1         : int
+        H0         : int
+        H1         : int
     }
 
     type Atlas = {
@@ -102,8 +63,6 @@ module File =
     }
 
 //------------------------------------------------------------------------------
-
-
 
 type Theme
 with
