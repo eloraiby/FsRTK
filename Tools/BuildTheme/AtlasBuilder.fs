@@ -13,7 +13,10 @@ open FsRTK.Math3D.Matrix
 open FsRTK.Math3D.Geometry
 
 open FsRTK.Algorithms
-open FsRTK.Ui
+
+open FsRTK.Ui.Widgets
+open FsRTK.Ui.Theme
+
 
 type RectangleOption =
     | DrawBounds
@@ -55,7 +58,7 @@ let toString o = o.ToString ()
 
 let compileFont (lib: SharpFont.Library)
                 (f: Face)
-                (rm: Ui.FontRenderMode)
+                (rm: FontRenderMode)
                 (size: int)
                 (g: Graphics)
                 (ropt: RectangleOption)
@@ -72,8 +75,8 @@ let compileFont (lib: SharpFont.Library)
                 
                 let rm =
                     match rm with
-                    | Ui.FontRenderMode.AntiAlias -> SharpFont.RenderMode.Normal
-                    | Ui.FontRenderMode.Mono      -> SharpFont.RenderMode.Mono
+                    | FontRenderMode.AntiAlias -> SharpFont.RenderMode.Normal
+                    | FontRenderMode.Mono      -> SharpFont.RenderMode.Mono
 
                 f.Glyph.RenderGlyph(rm)
 
@@ -110,14 +113,14 @@ let compileFont (lib: SharpFont.Library)
                     | DrawBounds -> g.DrawRectangle(pen, rect.Rectangle)
                     | NoBounds   -> ()
 
-                    cp, { Ui.CharInfo.AdvanceX  = advX
-                          Ui.CharInfo.AdvanceY  = advY
-                          Ui.CharInfo.Width     = width
-                          Ui.CharInfo.Height    = height
-                          Ui.CharInfo.Left      = left
-                          Ui.CharInfo.Top       = top
-                          Ui.CharInfo.TCoordX   = rect.X + 1
-                          Ui.CharInfo.TCoordY   = rect.Y + 1
+                    cp, { CharInfo.AdvanceX  = advX
+                          CharInfo.AdvanceY  = advY
+                          CharInfo.Width     = width
+                          CharInfo.Height    = height
+                          CharInfo.Left      = left
+                          CharInfo.Top       = top
+                          CharInfo.TCoordX   = rect.X + 1
+                          CharInfo.TCoordY   = rect.Y + 1
                         }
                 | None -> failwith "Not enough space"
 
@@ -139,10 +142,10 @@ let compileIcon (g: Graphics) (atlas: SkyLine.Atlas) (ropt: RectangleOption) (pt
             | DrawBounds -> g.DrawRectangle(pen, rect.Rectangle)
             | NoBounds   -> ()
 
-            { Ui.IconEntry.Width      = bmp.Width
-              Ui.IconEntry.Height     = bmp.Height
-              Ui.IconEntry.TCoordX    = rect.X + 1
-              Ui.IconEntry.TCoordY    = rect.Y + 1 }
+            { IconEntry.Width      = bmp.Width
+              IconEntry.Height     = bmp.Height
+              IconEntry.TCoordX    = rect.X + 1
+              IconEntry.TCoordY    = rect.Y + 1 }
         | None -> failwith "not enough space"
     with e ->
         failwith (sprintf "%s.png not found" icon.FileName)
@@ -162,14 +165,14 @@ let compileWidget (g: Graphics) (atlas: SkyLine.Atlas) (ropt: RectangleOption) (
             | DrawBounds -> g.DrawRectangle(pen, rect.Rectangle)
             | NoBounds   -> ()
 
-            { Ui.WidgetEntry.Width      = bmp.Width
-              Ui.WidgetEntry.Height     = bmp.Height
-              Ui.WidgetEntry.TCoordX    = rect.X + 1
-              Ui.WidgetEntry.TCoordY    = rect.Y + 1
-              Ui.WidgetEntry.V0         = widget.V0
-              Ui.WidgetEntry.V1         = widget.V1
-              Ui.WidgetEntry.H0         = widget.H0
-              Ui.WidgetEntry.H1         = widget.H1 }
+            { WidgetEntry.Width      = bmp.Width
+              WidgetEntry.Height     = bmp.Height
+              WidgetEntry.TCoordX    = rect.X + 1
+              WidgetEntry.TCoordY    = rect.Y + 1
+              WidgetEntry.V0         = widget.V0
+              WidgetEntry.V1         = widget.V1
+              WidgetEntry.H0         = widget.H0
+              WidgetEntry.H1         = widget.H1 }
         | None -> failwith "not enough space"
     with e ->
         failwith (sprintf "%s.png not found" widget.FileName)
@@ -209,9 +212,9 @@ let buildAtlas (ftLib: SharpFont.Library) (themeName: string) (size: isize2) (ro
                 use face = ftLib.NewFace (fontName, 0)
                 let cpMap   = compileFont ftLib face f.Mode f.Size g ropt slAtlas cps
                 (sprintf "%s-%O-%O" (stripDirectoryAndExtension f.FileName) f.Mode f.Size)
-                , { FontEntry.Mode       = f.Mode
-                    FontEntry.Size       = f.Size
-                    FontEntry.CodePoints = cpMap })
+                , { File.FontEntry.Mode       = f.Mode
+                    File.FontEntry.Size       = f.Size
+                    File.FontEntry.CodePoints = cpMap })
 
     // horizontal separator
     SkyLine.insert (slAtlas, irect(0, 0, size.width - 1, 1)) |> ignore
@@ -233,12 +236,12 @@ let buildAtlas (ftLib: SharpFont.Library) (themeName: string) (size: isize2) (ro
             (name, state), compileWidget g slAtlas ropt getPath w)
 
     let cmplAtlas   = {
-        Atlas.ImageName    = Path.GetFileName ((stripDirectoryAndExtension themeFile) + ".png")
-        Atlas.ImageWidth   = bmp.Width
-        Atlas.ImageHeight  = bmp.Height
-        Atlas.Fonts        = fontMap   
-        Atlas.Icons        = iconMap   
-        Atlas.Widgets      = widgetMap 
+        File.Atlas.ImageName    = Path.GetFileName ((stripDirectoryAndExtension themeFile) + ".png")
+        File.Atlas.ImageWidth   = bmp.Width
+        File.Atlas.ImageHeight  = bmp.Height
+        File.Atlas.Fonts        = fontMap   
+        File.Atlas.Icons        = iconMap   
+        File.Atlas.Widgets      = widgetMap 
     }
                       
     bmp.Save ((stripDirectoryAndExtension themeFile) + ".png", Imaging.ImageFormat.Png)

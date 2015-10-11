@@ -58,11 +58,6 @@ type IconEntry = {
     TCoordY    : int
 }
 
-type FontEntry = {
-    Mode       : FontRenderMode
-    Size       : int
-    CodePoints : (int * CharInfo) []
-}
 
 type WidgetState =
     | Hot
@@ -90,14 +85,21 @@ type WidgetEntry = {
     H1         : int
 }
 
-type Atlas = {
-    ImageName    : string
-    ImageWidth   : int
-    ImageHeight  : int
-    Fonts        : (string * FontEntry)[]
-    Icons        : (string * IconEntry)[]
-    Widgets      : ((string * WidgetState) * WidgetEntry)[]
-}
+module File =
+    type FontEntry = {
+        Mode       : FontRenderMode
+        Size       : int
+        CodePoints : (int * CharInfo) []
+    }
+
+    type Atlas = {
+        ImageName    : string
+        ImageWidth   : int
+        ImageHeight  : int
+        Fonts        : (string * FontEntry)[]
+        Icons        : (string * IconEntry)[]
+        Widgets      : ((string * WidgetState) * WidgetEntry)[]
+    }
 
 //------------------------------------------------------------------------------
 
@@ -129,7 +131,7 @@ type PointerEvent =
     | ClickAt   of vec2
     | ReleaseAt of vec2
     | DragTo    of vec2
-    | Scroll    of float
+    | Scroll    of single
 with
     static member extractPointerEvent (prev: PointerState, curr: PointerState) =
         match prev, curr with

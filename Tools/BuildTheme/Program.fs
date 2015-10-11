@@ -28,6 +28,9 @@ open FsRTK.Math3D.Vector
 open FsRTK.Math3D.Geometry
 open FsRTK.Math3D.Matrix
 
+open FsRTK.Ui.Theme
+open FsRTK.Ui.Widgets
+
 open AtlasBuilder
 
 type Arguments =
