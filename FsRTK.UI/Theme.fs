@@ -16,12 +16,15 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-namespace FsRTK.Ui
+module FsRTK.Ui.Theme
 
 open FsRTK
 open FsRTK.Math3D.Vector
 open FsRTK.Math3D.Matrix
 open FsRTK.Math3D.Geometry
+
+open FsRTK.Ui.Widgets
+
 
 type CharInfo = {
     AdvanceX  : int
@@ -98,57 +101,19 @@ type Atlas = {
 
 //------------------------------------------------------------------------------
 
-type InputReception =
-    | Accept
-    | Discard
 
-type Slider = {
-    Min : float
-    Max : float
-    Val : float
-}
 
-type Layout = {
-    Controls : (InputReception * Control)[]
-    Apply    : size2 * Control [] -> rect[]
-}
-
-and Control =
-    | Label     of string
-    | Checkbox  of string * bool
-    | Radiobox  of string * (InputReception * string * bool) []
-    | Button    of string * bool
-    | HSlider   of Slider
-    | Collapse  of string * Control[]
-    | Layout    of Layout
-
-type PointerState = {
-    Position    : vec2
-    Button0     : bool
-    Button1     : bool
-    Button2     : bool
-}
-
-type Frame = {
-    Title       : string
-    X           : float
-    Y           : float
-    Width       : float
-    Height      : float
-
-    HScroll     : float * float
-    VScroll     : float * float
-
-    Active      : int option
-    Hot         : int option
-
-    Layout      : Layout
-}
-
-type Theme = {
-    Name        : string
-    Present     : (rect * InputReception * Control)[] -> unit
-}
+type Theme
+with
+    static member contentSize (wid: Widget) : size2 =
+        match wid with
+        | Label     _ -> failwith "not implemented"
+        | Checkbox  _ -> failwith "not implemented"
+        | Radiobox  _ -> failwith "not implemented"
+        | Button    _ -> failwith "not implemented"
+        | HSlider   _ -> failwith "not implemented"
+        | Collapse  _ -> failwith "not implemented"
+        | Layout    _ -> failwith "not implemented"
 
 type FrameManagerState = {
     ActiveFrame : int option
@@ -173,7 +138,7 @@ with
         | { Position = p; Button0 = true  }, { Position = c; Button0 = false }             -> ReleaseAt c
         | _                                , { Position = c                  }             -> MoveTo    c
 
-type Control
+type FrameManagerState
 with
     static member getContainingBoxIndex (pos: vec2, rects: rect[]) : int option =
         let rec findFirst i =
@@ -185,8 +150,8 @@ with
             else None
         findFirst 0
 
-    static member nextHot    = Control.getContainingBoxIndex
-    static member nextActive = Control.getContainingBoxIndex
+    static member nextHot    = FrameManagerState.getContainingBoxIndex
+    static member nextActive = FrameManagerState.getContainingBoxIndex
 
 type private RenderState =
     | Hot
@@ -194,8 +159,8 @@ type private RenderState =
     | Normal
     | Disabled
 with
-    static member mapControlState e (isHot, isActive) =
-        match e with
+    static member mapControlState (wid: Widget) (isHot, isActive) =
+        match wid.InputReception with
         | InputReception.Accept ->
             match isHot, isActive with
             | _, true -> Active

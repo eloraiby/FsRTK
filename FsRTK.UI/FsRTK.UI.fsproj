@@ -45,7 +45,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="UI.fs" />
+    <Compile Include="Widgets.fs" />
+    <Compile Include="Theme.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FsRTK.Math3D\FsRTK.Math3D.fsproj">
