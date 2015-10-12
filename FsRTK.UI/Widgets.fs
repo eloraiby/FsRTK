@@ -35,20 +35,34 @@ type Slider = {
     Val : single
 }
 
+type WidgetState =
+    | Hot
+    | Active
+    | Normal
+    | Disabled
+with
+    static member parse str =
+        match str with
+        | ".hot"        -> Hot
+        | ".active"     -> Active
+        | ".normal"     -> Normal
+        | ".disabled"   -> Disabled
+        | _ -> failwith "invalid WidgetState case to parse"
+
+type Label = {
+    Font    : Font
+    Caption : string
+}
+
+type CollapseState =
+    | Collapsed
+    | Expanded
+
 type Layout = {
     Widgets : Widget []
     ComputeSize : Theme * Widget -> size2
     Apply   : size2 * Widget [] -> rect[]
 }
-
-and Label = {
-    Font    : Font
-    Caption : string
-}
-
-and CollapseState =
-    | Collapsed
-    | Expanded
 
 and Widget =
     | Label     of InputReception * Label
@@ -59,8 +73,18 @@ and Widget =
     | Collapse  of InputReception * Label * CollapseState * Widget[]
     | Layout    of InputReception * Layout
 
+and WidgetType =
+    | WtLabel      
+    | WtCheckbox  
+    | WtRadiobox  
+    | WtButton    
+    | WtHSlider   
+    | WtCollapse  
+    | WtLayout
+
 and Theme = {
     Name        : string
+    Widgets     : Map<WidgetType * WidgetState, Base.WidgetData>
     Present     : (rect * Widget)[] -> unit
     ComputeSize : Widget -> size2
 }
@@ -71,7 +95,10 @@ type PointerState = {
     Button0     : bool
     Button1     : bool
     Button2     : bool
-}
+} with
+    member x.Left   = x.Button0
+    member x.Middle = x.Button1
+    member x.Right  = x.Button2
 
 type Frame = {
     Title       : string
@@ -89,20 +116,18 @@ type Frame = {
     Layout      : Layout
 }
 
-type WidgetState =
-    | Hot
-    | Active
-    | Normal
-    | Disabled
+type WidgetType
 with
     static member parse str =
         match str with
-        | ".hot"        -> Hot
-        | ".active"     -> Active
-        | ".normal"     -> Normal
-        | ".disabled"   -> Disabled
-        | _ -> failwith "invalid WidgetState case to parse"
-
+        | "label"     -> WtLabel      
+        | "checkbox"  -> WtCheckbox  
+        | "radiobox"  -> WtRadiobox  
+        | "button"    -> WtButton    
+        | "hslider"   -> WtHSlider   
+        | "collapse"  -> WtCollapse  
+        | "layout"    -> WtLayout
+        | _           -> failwith "unrecognized widget type"
 
 type Widget
 with

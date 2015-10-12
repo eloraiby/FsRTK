@@ -48,8 +48,14 @@
     <Compile Include="Base.fs" />
     <Compile Include="Widgets.fs" />
     <Compile Include="Theme.fs" />
+    <Compile Include="Compositor.fs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FsRTK.Data\FsRTK.Data.fsproj">
+      <Name>FsRTK.Data</Name>
+      <Project>{9078c99d-6881-4bda-b3e2-53dffd514e90}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\FsRTK.Math3D\FsRTK.Math3D.fsproj">
       <Name>FsRTK.Math3D</Name>
       <Project>{b53da48b-1cc6-4ef9-b1f1-9cabccf0450c}</Project>

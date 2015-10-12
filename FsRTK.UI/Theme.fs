@@ -64,6 +64,45 @@ module File =
 
 //------------------------------------------------------------------------------
 
+type FontData
+with
+    static member from (f: File.FontEntry) = {
+        Mode       = f.Mode
+        Size       = f.Size
+        CodePoints = f.CodePoints |> Map.ofArray }
+
+type IconData
+with
+    static member from (i: File.IconEntry) = {
+        IconData.Width      = i.Width   
+        IconData.Height     = i.Height  
+        IconData.TCoordX    = i.TCoordX 
+        IconData.TCoordY    = i.TCoordY  }
+
+type WidgetData
+with
+    static member from (w: File.WidgetEntry) = {
+        Width      = w.Width   
+        Height     = w.Height  
+        TCoordX    = w.TCoordX 
+        TCoordY    = w.TCoordY 
+
+        V0         = w.V0      
+        V1         = w.V1      
+        H0         = w.H0      
+        H1         = w.H1 }
+
+type Atlas
+with
+    static member from (a: File.Atlas) = {
+        ImageName    = a.ImageName
+        ImageWidth   = a.ImageWidth
+        ImageHeight  = a.ImageHeight
+        Fonts        = a.Fonts   |> Array.map(fun (s, f) -> s, FontData.from f)   |> Map.ofArray
+        Icons        = a.Icons   |> Array.map(fun (s, i) -> s, IconData.from i)   |> Map.ofArray
+        Widgets      = a.Widgets |> Array.map(fun (s, w) -> s, WidgetData.from w) |> Map.ofArray      
+        }
+
 type Theme
 with
     static member contentSize (wid: Widget) : size2 =
@@ -75,6 +114,13 @@ with
         | HSlider   _ -> failwith "not implemented"
         | Collapse  _ -> failwith "not implemented"
         | Layout    _ -> failwith "not implemented"
+
+    static member fromFile filename =
+        use f = System.IO.File.OpenText filename
+        let atlas = f.ReadToEnd ()
+                    |> Data.JsonValue.Parse
+                    |> Data.Json.deserialize<File.Atlas>
+        Atlas.from atlas
 
 type FrameManagerState = {
     ActiveFrame : int option
