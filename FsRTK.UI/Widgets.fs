@@ -41,13 +41,12 @@ type WidgetState =
     | Normal
     | Disabled
 with
-    static member parse str =
-        match str with
-        | ".hot"        -> Hot
-        | ".active"     -> Active
-        | ".normal"     -> Normal
-        | ".disabled"   -> Disabled
-        | _ -> failwith "invalid WidgetState case to parse"
+    override x.ToString () =
+        match x with
+        | Hot       -> "hot"       
+        | Active    -> "active"    
+        | Normal    -> "normal"    
+        | Disabled  -> "disabled"  
 
 type Label = {
     Font    : Font
@@ -81,6 +80,16 @@ and WidgetType =
     | WtHSlider   
     | WtCollapse  
     | WtLayout
+with
+    override x.ToString () =
+        match x with
+        | WtLabel    -> "label"    
+        | WtCheckbox -> "checkbox" 
+        | WtRadiobox -> "radiobox" 
+        | WtButton   -> "button"   
+        | WtHSlider  -> "hslider"  
+        | WtCollapse -> "collapse" 
+        | WtLayout   -> "layout" 
 
 and Theme = {
     Name        : string
@@ -116,6 +125,16 @@ type Frame = {
     Layout      : Layout
 }
 
+type WidgetState
+with
+    static member parse str =
+        match str with
+        | "hot"        -> Hot
+        | "active"     -> Active
+        | "normal"     -> Normal
+        | "disabled"   -> Disabled
+        | _ -> failwith "invalid WidgetState case to parse"
+
 type WidgetType
 with
     static member parse str =
@@ -128,6 +147,13 @@ with
         | "collapse"  -> WtCollapse  
         | "layout"    -> WtLayout
         | _           -> failwith "unrecognized widget type"
+
+  
+
+let widgetTypeAndState (str: string) =
+    match str.Split('.') with
+    | [| wt; ws |] -> wt, ws |> WidgetState.parse
+    | _            -> failwith "invalid widget type and/or state"
 
 type Widget
 with

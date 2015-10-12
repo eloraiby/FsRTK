@@ -100,7 +100,7 @@ with
         ImageHeight  = a.ImageHeight
         Fonts        = a.Fonts   |> Array.map(fun (s, f) -> s, FontData.from f)   |> Map.ofArray
         Icons        = a.Icons   |> Array.map(fun (s, i) -> s, IconData.from i)   |> Map.ofArray
-        Widgets      = a.Widgets |> Array.map(fun (s, w) -> s, WidgetData.from w) |> Map.ofArray      
+        Widgets      = a.Widgets |> Array.map(fun ((wt, ws), w) -> (sprintf "%O.%O" wt ws), WidgetData.from w) |> Map.ofArray      
         }
 
 type Theme
