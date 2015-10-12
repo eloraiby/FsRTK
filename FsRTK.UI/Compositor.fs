@@ -31,17 +31,17 @@ open FsRTK.Ui.Theme
 
 [<StructAttribute>]
 type Vertex =
-    [<FieldOffsetAttribute(0)>]  val Position    : vec2
-    [<FieldOffsetAttribute(8)>]  val TexCoord    : vec2
-    [<FieldOffsetAttribute(16)>] val Color       : vec4
+    val Position    : vec2
+    val TexCoord    : vec2
+    val Color       : vec4
 
     new(pos: vec2, tcoord: vec2, col: vec4)    = { Position = pos; TexCoord = tcoord; Color = col }
 
 [<StructAttribute>]
 type Triangle =
-    [<FieldOffsetAttribute(0)>] val v0          : uint16
-    [<FieldOffsetAttribute(2)>] val v1          : uint16
-    [<FieldOffsetAttribute(4)>] val v2          : uint16
+    val v0          : uint16
+    val v1          : uint16
+    val v2          : uint16
 
     new(v0, v1, v2) = { v0 = v0; v1 = v1; v2 = v2 }
     
@@ -55,8 +55,8 @@ type Triangle =
 
 [<StructAttribute>]
 type Box =
-    [<FieldOffsetAttribute(0)>] val Min         : vec2
-    [<FieldOffsetAttribute(8)>] val Max         : vec2
+    val Min         : vec2
+    val Max         : vec2
 
     new(mn: vec2, mx: vec2)     =
         let xMin = min mn.x mx.x
