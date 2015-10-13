@@ -335,10 +335,7 @@ module private Native =
     
     [<Literal>]
     let MaxAttachedShaders = 64
-    
-    [<Literal>]
-    let MaxLogSize = 65536
-    
+       
     [<Literal>]
     let MaxShaderSize = 65536
     
@@ -548,7 +545,7 @@ module private Native =
     extern unit emu_glGetProgramiv(int32 program, GLenum pname, int32 * parms)
     
     [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
-    extern unit emu_glGetProgramInfoLog(int32 program, int32 bufSize, int32 * length, char * infoLog)
+    extern unit emu_glGetProgramInfoLog(int32 program, int32 bufSize, [<Out>] int32& length, [<Out; MarshalAs(UnmanagedType.LPArray)>] byte[] infoLog)
     
     [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glGetRenderbufferParameteriv(GLenum target, GLenum pname, int32 * parms)
@@ -557,7 +554,7 @@ module private Native =
     extern unit emu_glGetShaderiv(int32 shader, GLenum pname, int32 * parms)
     
     [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
-    extern unit emu_glGetShaderInfoLog(int32 shader, int32 bufSize, int32 * length, char * infoLog)
+    extern unit emu_glGetShaderInfoLog(int32 shader, int32 bufSize, [<Out>] int32& length, [<Out; MarshalAs(UnmanagedType.LPArray)>] byte[] infoLog)
     
     [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glGetShaderPrecisionFormat(GLenum shadertype, GLenum precisiontype, int32 * range, int32 * precision)
@@ -916,6 +913,7 @@ type ShaderVariable =
 
 let [<LiteralAttribute>] MAX_NAME_SIZE = 512
 let [<LiteralAttribute>] MAX_SHADERS   = 512
+let [<LiteralAttribute>] MAX_LOG_SIZE  = 65536
 
 let glGetActiveAttrib (program, index) =
     let buff = Array.zeroCreate<byte> MAX_NAME_SIZE
@@ -946,10 +944,20 @@ let glGetError              = emu_glGetError
 //let glGetFramebufferAttachm = emu_glGetFramebufferAttachmentParameteriv (GLenum target, GLenum attachment, GLenum pname, int32 *parms)
 //let glGetIntegerv           = emu_glGetIntegerv          (GLenum pname, int32 *data)
 //let glGetProgramiv          = emu_glGetProgramiv         (int32 program, GLenum pname, int32 *parms)
-//let glGetProgramInfoLog     = emu_glGetProgramInfoLog    (int32 program, int32 bufSize, int32 *length, char *infoLog)
+let glGetProgramInfoLog shader =
+    let infoLog = Array.zeroCreate<byte> MAX_LOG_SIZE
+    let mutable length, size, type_ = 0, 0, GLenum.GL_ZERO
+    emu_glGetProgramInfoLog (shader, infoLog.Length, &length, infoLog)
+    Text.Encoding.UTF8.GetString(infoLog, 0, length)
+
 //let glGetRenderbufferParame = emu_glGetRenderbufferParameteriv   (GLenum target, GLenum pname, int32 *parms)
 //let glGetShaderiv           = emu_glGetShaderiv          (int32 shader, GLenum pname, int32 *parms)
-//let glGetShaderInfoLog      = emu_glGetShaderInfoLog     (int32 shader, int32 bufSize, int32 *length, char *infoLog)
+let glGetShaderInfoLog shader =
+    let infoLog = Array.zeroCreate<byte> MAX_LOG_SIZE
+    let mutable length, size, type_ = 0, 0, GLenum.GL_ZERO
+    emu_glGetShaderInfoLog (shader, infoLog.Length, &length, infoLog)
+    Text.Encoding.UTF8.GetString(infoLog, 0, length)
+
 //let glGetShaderPrecisionFor = emu_glGetShaderPrecisionFormat (GLenum shadertype, GLenum precisiontype, int32 *range, int32 *precision)
 //let glGetShaderSource       = emu_glGetShaderSource      (int32 shader, int32 bufSize, int32 *length, char *source)
 //let glGetString             = emu_glGetString            (GLenum name)
