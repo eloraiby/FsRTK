@@ -944,6 +944,7 @@ let glGetError              = emu_glGetError
 //let glGetFramebufferAttachm = emu_glGetFramebufferAttachmentParameteriv (GLenum target, GLenum attachment, GLenum pname, int32 *parms)
 //let glGetIntegerv           = emu_glGetIntegerv          (GLenum pname, int32 *data)
 //let glGetProgramiv          = emu_glGetProgramiv         (int32 program, GLenum pname, int32 *parms)
+
 let glGetProgramInfoLog shader =
     let infoLog = Array.zeroCreate<byte> MAX_LOG_SIZE
     let mutable length, size, type_ = 0, 0, GLenum.GL_ZERO
@@ -952,6 +953,7 @@ let glGetProgramInfoLog shader =
 
 //let glGetRenderbufferParame = emu_glGetRenderbufferParameteriv   (GLenum target, GLenum pname, int32 *parms)
 //let glGetShaderiv           = emu_glGetShaderiv          (int32 shader, GLenum pname, int32 *parms)
+
 let glGetShaderInfoLog shader =
     let infoLog = Array.zeroCreate<byte> MAX_LOG_SIZE
     let mutable length, size, type_ = 0, 0, GLenum.GL_ZERO
