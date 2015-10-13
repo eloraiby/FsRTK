@@ -581,7 +581,7 @@ module private Native =
     extern unit emu_glGetUniformiv(int32 program, int32 location, int32 * parms)
     
     [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
-    extern int32 emu_glGetUniformLocation(int32 program, char * name)
+    extern int32 emu_glGetUniformLocation(int32 program, [<MarshalAs(UnmanagedType.LPStr)>] string name)
     
     [<DllImport(DllName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)>]
     extern unit emu_glGetVertexAttribfv(int32 index, GLenum pname, single * parms)
@@ -796,6 +796,9 @@ let glBlendFuncSeparate     = emu_glBlendFuncSeparate
 
 let glSizeOf<'T> = Marshal.SizeOf(typedefof<'T>)
 
+let glBufferDataInit<'T when 'T : struct> (target, count: int, usage) =
+    emu_glBufferData (target, glSizeOf<'T> * count, IntPtr.Zero, usage)
+
 let glBufferData<'T when 'T : struct> (target, data: 'T[], usage) =
     let gch = GCHandle.Alloc (data, GCHandleType.Pinned)
     emu_glBufferData (target, glSizeOf<'T> * data.Length, gch.AddrOfPinnedObject(), usage)
@@ -954,7 +957,7 @@ let glGetError              = emu_glGetError
 //let glGetTexParameteriv     = emu_glGetTexParameteriv    (GLenum target, GLenum pname, int32 *parms)
 //let glGetUniformfv          = emu_glGetUniformfv         (int32 program, int32 location, single *parms)
 //let glGetUniformiv          = emu_glGetUniformiv         (int32 program, int32 location, int32 *parms)
-//let glGetUniformLocation     = emu_glGetUniformLocation   (int32 program, char *name)
+let glGetUniformLocation     = emu_glGetUniformLocation
 //let glGetVertexAttribfv     = emu_glGetVertexAttribfv     (int32 index, GLenum pname, single *parms)
 //let glGetVertexAttribiv     = emu_glGetVertexAttribiv     (int32 index, GLenum pname, int32 *parms)
 ////let emu_glGetVertexAttribPointerv  (int32 index, GLenum pname, void **pointer);                                                                                                      
@@ -996,6 +999,9 @@ let glStencilMask           = emu_glStencilMask
 let glStencilMaskSeparate   = emu_glStencilMaskSeparate
 let glStencilOp             = emu_glStencilOp
 let glStencilOpSeparate     = emu_glStencilOpSeparate
+
+let glTexImage2DPtr(target, level, internalformat, width, height, border, format, type_, pixels) =
+    emu_glTexImage2D (target, level, internalformat, width, height, border, format, type_, pixels)
 
 let glTexImage2D<'T when 'T: struct> (target, level, internalformat, width, height, border, format, type_, pixels: 'T[]) =
     let gch = GCHandle.Alloc(pixels, GCHandleType.Pinned)

@@ -41,6 +41,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
@@ -49,11 +50,17 @@
     <Compile Include="Widgets.fs" />
     <Compile Include="Theme.fs" />
     <Compile Include="Compositor.fs" />
+    <Compile Include="Gles2Driver.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FsRTK.Data\FsRTK.Data.fsproj">
       <Name>FsRTK.Data</Name>
       <Project>{9078c99d-6881-4bda-b3e2-53dffd514e90}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\FsRTK.GLES2\FsRTK.GLES2.fsproj">
+      <Name>FsRTK.GLES2</Name>
+      <Project>{80078867-21ea-468d-a53c-f3798f145c94}</Project>
       <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\FsRTK.Math3D\FsRTK.Math3D.fsproj">
