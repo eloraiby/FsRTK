@@ -36,7 +36,12 @@ let main argv =
     let window = Glfw3.createWindow (800, 640, "Test UI", None, None)
     Glfw3.makeContextCurrent window
     
-    let quit = ref false
+    while Glfw3.windowShouldClose window |> not do
+        glClearColor (0.0f, 0.0f, 0.0f, 0.0f)
+        glClear ((GLenum.GL_COLOR_BUFFER_BIT ||| GLenum.GL_DEPTH_BUFFER_BIT) |> int)
+        Glfw3.swapBuffers window
+
+        Glfw3.pollEvents ()
         
     Glfw3.destroyWindow window
 
