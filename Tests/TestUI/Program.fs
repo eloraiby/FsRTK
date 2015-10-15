@@ -44,9 +44,12 @@ let main argv =
         glClearColor (0.0f, 0.0f, 0.0f, 0.0f)
         glClear ((GLenum.GL_COLOR_BUFFER_BIT ||| GLenum.GL_DEPTH_BUFFER_BIT) |> int)
 
-        let wsize = Glfw3.getWindowSize window
-        uiCompositor.Post (Ui.Compositor.PushRegion (Ui.Compositor.Box (0.0f, 0.0f, fst wsize |> single, snd wsize |> single)))
-        uiCompositor.Post (Ui.Compositor.Command.DrawString (vec2(100.0f, 100.0f), color4(1.0f, 1.0f, 1.0f, 1.0f), droid12.Value, "Hello World"))
+        let width, height = Glfw3.getWindowSize window
+        glViewport (0, 0, width, height)
+        uiCompositor.Post (Ui.Compositor.Command.FillRect (vec2(0.0f, 0.0f), size2(width |> single, height |> single), color4(0.0f, 1.0f, 0.0f, 1.0f)))
+        uiCompositor.Post (Ui.Compositor.PushRegion (Ui.Compositor.Box (0.0f, 0.0f, width |> single, height |> single)))
+        uiCompositor.Post (Ui.Compositor.Command.DrawString (droid12.Value, vec2(100.0f, 100.0f), "Hello World", color4(1.0f, 1.0f, 1.0f, 1.0f)))
+        uiCompositor.Post (Ui.Compositor.Command.DrawLine (0.25f, vec2(50.0f, 50.0f), vec2(750.0f, 600.0f), color4(1.0f, 0.0f, 0.0f, 1.0f)))
         uiCompositor.PresentAndReset () |> ignore
 
         Glfw3.swapBuffers window

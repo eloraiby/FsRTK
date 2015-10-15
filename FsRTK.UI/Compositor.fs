@@ -149,7 +149,7 @@ type IDriver =
 
 let [<LiteralAttribute>] private MAX_REGIONS = 128
 
-type private RendererState = {
+type private CompositorState = {
     VB              : Vertex[]
     TB              : Triangle[]
 
@@ -225,7 +225,7 @@ type private CompositorImpl(atlas: string, driver: IDriver) =
     
     do driver.SetAtlasImage uiImage
 
-    let state = RendererState.create (driver.MaxVertexCount, driver.MaxTriangleCount, atlas, driver)
+    let state = CompositorState.create (driver.MaxVertexCount, driver.MaxTriangleCount, atlas, driver)
 
     let imWidth     = atlas.ImageWidth  |> single
     let imHeight    = atlas.ImageHeight |> single
@@ -243,7 +243,9 @@ type private CompositorImpl(atlas: string, driver: IDriver) =
             state.TriCount      <- 0
             state.CountDC       <- state.CountDC + 1
 
-    let tcoordToUV(posX: int, posY: int) : vec2 = vec2((posX |> single) / imWidth, (posY |> single) / imHeight)
+    let tcoordToUV(posX: int, posY: int) : vec2 =
+        vec2((posX |> single) / imWidth, (posY |> single) / imHeight)
+
     let compVec3 (v: vec2) =
         let z = (state.TriCount |> single) / (single driver.MaxTriangleCount)
         vec3(v.x, v.y, z)
@@ -296,14 +298,14 @@ type private CompositorImpl(atlas: string, driver: IDriver) =
         
         addVertsTris(4, 2)
         
-    let drawIcon (ie: IconData, pos: vec2, size: size2, col: color4) =
+    let drawIcon (ie: IconData, pos: vec2, size: size2, uvOff: vec2, col: color4) =
         tryFlush (4, 2)
 
         let uv0 = tcoordToUV(ie.TCoordX, ie.TCoordY)
         let uv1 = tcoordToUV(ie.TCoordX + ie.Width, ie.TCoordY + ie.Height)
 
-        let u0, v0  = uv0.x, uv0.y
-        let u1, v1  = uv1.x, uv1.y
+        let u0, v0  = uv0.x + uvOff.x, uv0.y + uvOff.y
+        let u1, v1  = uv1.x - uvOff.x, uv1.y - uvOff.y
 
         let x0, y0, x1, y1 =
             pos.x,
@@ -353,8 +355,9 @@ type private CompositorImpl(atlas: string, driver: IDriver) =
                 y + region.Min.y + scale * (chInfo.Height |> single)
 
             let uv0, uv1 =
-                tcoordToUV(chInfo.TCoordX, chInfo.TCoordY),
-                tcoordToUV(chInfo.TCoordX + chInfo.Width, chInfo.TCoordY + chInfo.Height)
+                let offset = vec2(0.0f, 0.0f) //vec2(0.5f / imWidth, 0.5f / imHeight)
+                tcoordToUV(chInfo.TCoordX, chInfo.TCoordY) + offset,
+                tcoordToUV(chInfo.TCoordX + chInfo.Width, chInfo.TCoordY + chInfo.Height) - offset
 
             Vertex(vec2(x0, y0), uv0, col),
             Vertex(vec2(x1, y1), uv1, col)
@@ -402,7 +405,7 @@ type private CompositorImpl(atlas: string, driver: IDriver) =
         state.CharPos     <- vec2(state.CharPos.x + scale * (chInfo.AdvanceX |> single),
                                   state.CharPos.y + scale * (chInfo.AdvanceY |> single))
 
-    let drawString (res: RendererState, font: FontData, scale: single) (pos: vec2) (col: color4) (s: string) =
+    let drawString (font: FontData, scale: single) (pos: vec2) (col: color4) (s: string) =
         printfn ""
         state.CharPos <- pos
         for ch in s do
@@ -410,6 +413,7 @@ type private CompositorImpl(atlas: string, driver: IDriver) =
             then state.CharPos <- vec2(pos.x, state.CharPos.y + scale * (font.Size |> single))
             else drawChar (font, col, scale) ch
           
+    //let drawWidget (rs: CompositorState, widget)
     interface ICompositor with
         member x.TryGetFont (s: string) = state.UiAtlas.Fonts.TryFind s
 
@@ -420,11 +424,13 @@ type private CompositorImpl(atlas: string, driver: IDriver) =
                 | PushRegion b  -> state.Push b
                 | PopRegion     -> state.Pop |> ignore
                 | DrawString (fe, pos, str, col) ->
-                    drawString (state, fe, 1.0f) pos col str
+                    drawString (fe, 1.0f) pos col str
                     state.CharPos       <- vec2()
 
-                | FillRect (s, size, col) -> drawIcon (white, s, size, col)
-                | DrawIcon (ie, pos)    -> drawIcon (white, pos, size2(ie.Width  |> single, ie.Height |> single), color4(1.0f, 1.0f, 1.0f, 1.0f))
+                | FillRect (s, size, col) ->
+                    let off = vec2(0.5f / imWidth, 0.5f / imHeight)
+                    drawIcon (white, s, size, off, col)
+                | DrawIcon (ie, pos)    -> drawIcon (white, pos, size2(ie.Width  |> single, ie.Height |> single), vec2(), color4(1.0f, 1.0f, 1.0f, 1.0f))
                 | DrawLine (t, s, e, col)  -> drawLine(t, s, e, col)
                 | DrawRect (t, s, size, col) ->
                     drawLine(t, s, s + vec2(size.width, 0.0f), col)
