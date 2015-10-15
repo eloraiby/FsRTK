@@ -33,9 +33,9 @@ open FsRTK.Ui.Theme
 type Vertex =
     val Position    : vec2
     val TexCoord    : vec2
-    val Color       : vec4
+    val Color       : color4
 
-    new(pos: vec2, tcoord: vec2, col: vec4)    = { Position = pos; TexCoord = tcoord; Color = col }
+    new(pos: vec2, tcoord: vec2, col: color4)    = { Position = pos; TexCoord = tcoord; Color = col }
 
 [<StructAttribute>]
 type Triangle =
@@ -206,10 +206,10 @@ type private RendererState = {
 type Command =
     | PushRegion    of Box
     | PopRegion
-    | DrawString    of vec2 * vec4 * FontData * string   
-    | FillRect      of vec2 * size2 * vec4
-    | DrawLine      of single * vec2 * vec2 * vec4
-    | DrawRect      of single * vec2 * size2 * vec4
+    | DrawString    of vec2 * color4 * FontData * string   
+    | FillRect      of vec2 * size2 * color4
+    | DrawLine      of single * vec2 * vec2 * color4
+    | DrawRect      of single * vec2 * size2 * color4
     | DrawIcon      of IconData * vec2
 
 type ICompositor =
@@ -251,7 +251,7 @@ type private Renderer(atlas: string, driver: IDriver) =
         state.VertexCount   <- state.VertexCount + vCount
         state.TriCount      <- state.TriCount    + tCount
 
-    let drawLine (t: single, s: vec2, e: vec2, col: vec4) =
+    let drawLine (t: single, s: vec2, e: vec2, col: color4) =
         tryFlush (4, 2)
 
         let wX  = white.TCoordX + white.Width / 2
@@ -295,7 +295,7 @@ type private Renderer(atlas: string, driver: IDriver) =
         
         addVertsTris(4, 2)
         
-    let drawIcon (ie: IconData, pos: vec2, size: size2, col: vec4) =
+    let drawIcon (ie: IconData, pos: vec2, size: size2, col: color4) =
         tryFlush (4, 2)
 
         let uv0 = tcoordToUV(ie.TCoordX, ie.TCoordY)
@@ -337,7 +337,7 @@ type private Renderer(atlas: string, driver: IDriver) =
         
         addVertsTris(4, 2)
 
-    let drawChar (fe: FontData, col: vec4, scale: single) (ch: char) =
+    let drawChar (fe: FontData, col: color4, scale: single) (ch: char) =
         tryFlush (4, 2)
 
         let chInfo  = fe.CodePoints.[ch |> int]
@@ -401,7 +401,7 @@ type private Renderer(atlas: string, driver: IDriver) =
         state.CharPos     <- vec2(state.CharPos.x + scale * (chInfo.AdvanceX |> single),
                                   state.CharPos.y + scale * (chInfo.AdvanceY |> single))
 
-    let drawString (res: RendererState, font: FontData, scale: single) (pos: vec2) (col: vec4) (s: string) =
+    let drawString (res: RendererState, font: FontData, scale: single) (pos: vec2) (col: color4) (s: string) =
         printfn ""
         state.CharPos <- pos
         for ch in s do
@@ -423,7 +423,7 @@ type private Renderer(atlas: string, driver: IDriver) =
                     state.CharPos       <- vec2()
 
                 | FillRect (s, size, col) -> drawIcon (white, s, size, col)
-                | DrawIcon (ie, pos)    -> drawIcon (white, pos, size2(ie.Width  |> single, ie.Height |> single), vec4(1.0f, 1.0f, 1.0f, 1.0f))
+                | DrawIcon (ie, pos)    -> drawIcon (white, pos, size2(ie.Width  |> single, ie.Height |> single), color4(1.0f, 1.0f, 1.0f, 1.0f))
                 | DrawLine (t, s, e, col)  -> drawLine(t, s, e, col)
                 | DrawRect (t, s, size, col) ->
                     drawLine(t, s, s + vec2(size.width, 0.0f), col)

@@ -125,7 +125,7 @@ type ivec2 = struct
         match i with
         | 0 -> x.x
         | 1 -> x.y
-        | _ -> failwith "vec2: index out of range"
+        | _ -> failwith "ivec2: index out of range"
 
     static member inline (+) (a: ivec2, b: ivec2)    = ivec2(a.x + b.x, a.y + b.y)
     static member inline (-) (a: ivec2, b: ivec2)    = ivec2(a.x - b.x, a.y - b.y)
@@ -157,7 +157,7 @@ type ivec3 = struct
         | 0 -> x.x
         | 1 -> x.y
         | 2 -> x.z
-        | _ -> failwith "vec3: index out of range"
+        | _ -> failwith "ivec3: index out of range"
 
     member x.xy = ivec2(x.x, x.y)
 
@@ -191,7 +191,7 @@ type ivec4 = struct
         | 1 -> x.y
         | 2 -> x.z
         | 3 -> x.w
-        | _ -> failwith "vec4: index out of range"
+        | _ -> failwith "ivec4: index out of range"
 
     static member inline (+) (a: ivec4, b: ivec4)    = ivec4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w)
     static member inline (-) (a: ivec4, b: ivec4)    = ivec4(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w)
@@ -205,4 +205,31 @@ type ivec4 = struct
     static member inline length (v: ivec4)               = Math.Sqrt(ivec4.dot(v, v) |> float) |> int
     static member inline distance (v0: ivec4, v1: ivec4) = let s = v1 - v0 in ivec4.length s
     static member inline normalize (v: ivec4)            = let l = ivec4.length v in v / l   
+    end
+
+type color4 = struct
+    val         r   : single
+    val         g   : single
+    val         b   : single
+    val         a   : single
+    
+    new(r, g, b, a) = { r = r; g = g; b = b; a = a; }
+
+    member x.Item i =
+        match i with
+        | 0 -> x.r
+        | 1 -> x.g
+        | 2 -> x.b
+        | 3 -> x.a
+        | _ -> failwith "color4: index out of range"
+
+    static member inline (+) (a: color4, b: color4)    = color4(a.r + b.r, a.g + b.g, a.b + b.b, a.a + b.a)
+    static member inline (-) (a: color4, b: color4)    = color4(a.r - b.r, a.g - b.g, a.b - b.b, a.a - b.a)
+    static member inline (*) (a: color4, b: color4)    = color4(a.r * b.r, a.g * b.g, a.b * b.b, a.a * b.a)
+    static member inline (/) (a: color4, b: color4)    = color4(a.r / b.r, a.g / b.g, a.b / b.b, a.a / b.a)
+
+    static member inline (*) (a: color4, b: single)    = color4(a.r * b, a.g * b, a.b * b, a.a * b)
+    static member inline (/) (a: color4, b: single)    = color4(a.r / b, a.g / b, a.b / b, a.a / b)
+
+    static member inline normalize (v: color4)         = let l = vec4.length (vec4 (v.r, v.g, v.b, v.a)) in v / l   
     end
