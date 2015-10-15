@@ -35,14 +35,22 @@ let main argv =
 
     let window = Glfw3.createWindow (800, 640, "Test UI", None, None)
     Glfw3.makeContextCurrent window
-    
+    let atlas = Theme.fromFile "test.atlas"
+    let uiDriver = new Ui.Gles2Driver.OpenGLDriver (65535, 8096) :> Ui.Compositor.IDriver
+    let uiCompositor = Ui.Compositor.create ("test.atlas", uiDriver)
+    let droid12 = uiCompositor.TryGetFont "DroidSans-antialias-12"
     while Glfw3.windowShouldClose window |> not do
         glClearColor (0.0f, 0.0f, 0.0f, 0.0f)
         glClear ((GLenum.GL_COLOR_BUFFER_BIT ||| GLenum.GL_DEPTH_BUFFER_BIT) |> int)
-        Glfw3.swapBuffers window
 
+        let wsize = Glfw3.getWindowSize window
+        uiCompositor.Post (Ui.Compositor.PushRegion (Ui.Compositor.Box (0.0f, 0.0f, fst wsize |> single, snd wsize |> single)))
+        uiCompositor.Post (Ui.Compositor.Command.DrawString (vec2(100.0f, 100.0f), vec4(1.0f, 1.0f, 1.0f, 1.0f), droid12.Value, "Hello World"))
+        uiCompositor.PresentAndReset () |> ignore
+
+        Glfw3.swapBuffers window
         Glfw3.pollEvents ()
         
     Glfw3.destroyWindow window
 
-    0 // return an integer exit code
+    0

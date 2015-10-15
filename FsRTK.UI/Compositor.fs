@@ -212,14 +212,19 @@ type Command =
     | DrawRect      of single * vec2 * size2 * vec4
     | DrawIcon      of IconData * vec2
 
-type Renderer(maxVertexCount: int, maxTriangleCount: int, atlas: string, driver: IDriver) =
+type ICompositor =
+    abstract member TryGetFont      : string -> FontData option
+    abstract member PresentAndReset : unit -> int
+    abstract member Post            : Command -> unit
+
+type private Renderer(atlas: string, driver: IDriver) =
     let atlas   = Theme.fromFile atlas
     let uiImage = atlas.ImageName
     let white   = atlas.Icons.["white"]
     
     do driver.SetAtlasImage uiImage
 
-    let state = RendererState.create (maxVertexCount, maxTriangleCount, atlas, driver)
+    let state = RendererState.create (driver.MaxVertexCount, driver.MaxTriangleCount, atlas, driver)
 
     let imWidth     = atlas.ImageWidth  |> single
     let imHeight    = atlas.ImageHeight |> single
@@ -229,8 +234,8 @@ type Renderer(maxVertexCount: int, maxTriangleCount: int, atlas: string, driver:
     let tryFlush (reqVerts: int, reqTris: int) =
         let width, height = state.AbsRegionStack.[0].Width, state.AbsRegionStack.[0].Height
 
-        if state.VertexCount + reqVerts > maxVertexCount   ||
-           state.TriCount    + reqTris  > maxTriangleCount
+        if state.VertexCount + reqVerts > driver.MaxVertexCount   ||
+           state.TriCount    + reqTris  > driver.MaxTriangleCount
         then
             driver.RenderBatch(vec2(width, height), state.VB, state.VertexCount, state.TB, state.TriCount)
             state.VertexCount   <- 0
@@ -239,7 +244,7 @@ type Renderer(maxVertexCount: int, maxTriangleCount: int, atlas: string, driver:
 
     let tcoordToUV(posX: int, posY: int) : vec2 = vec2((posX |> single) / imWidth, (posY |> single) / imHeight)
     let compVec3 (v: vec2) =
-        let z = (state.TriCount |> single) / (single maxTriangleCount)
+        let z = (state.TriCount |> single) / (single driver.MaxTriangleCount)
         vec3(v.x, v.y, z)
         
     let addVertsTris(vCount: int, tCount: int) =
@@ -404,41 +409,44 @@ type Renderer(maxVertexCount: int, maxTriangleCount: int, atlas: string, driver:
             then state.CharPos <- vec2(pos.x, state.CharPos.y + scale * (font.Size |> single))
             else drawChar (font, col, scale) ch
           
-    member x.TryGetFont (s: string) = state.UiAtlas.Fonts.TryFind s
+    interface ICompositor with
+        member x.TryGetFont (s: string) = state.UiAtlas.Fonts.TryFind s
 
-    member x.PresentAndReset() =
-        driver.BeginUi ()
-        while queue.Count > 0 do
-            match queue.Dequeue() with
-            | PushRegion b  -> state.Push b
-            | PopRegion     -> state.Pop |> ignore
-            | DrawString (pos, col, fe, str) ->
-                drawString (state, fe, 1.0f) pos col str
-                state.CharPos       <- vec2()
+        member x.PresentAndReset() =
+            driver.BeginUi ()
+            while queue.Count > 0 do
+                match queue.Dequeue() with
+                | PushRegion b  -> state.Push b
+                | PopRegion     -> state.Pop |> ignore
+                | DrawString (pos, col, fe, str) ->
+                    drawString (state, fe, 1.0f) pos col str
+                    state.CharPos       <- vec2()
 
-            | FillRect (s, size, col) -> drawIcon (white, s, size, col)
-            | DrawIcon (ie, pos)    -> drawIcon (white, pos, size2(ie.Width  |> single, ie.Height |> single), vec4(1.0f, 1.0f, 1.0f, 1.0f))
-            | DrawLine (t, s, e, col)  -> drawLine(t, s, e, col)
-            | DrawRect (t, s, size, col) ->
-                drawLine(t, s, s + vec2(size.width, 0.0f), col)
-                drawLine(t, s + vec2(size.width, 0.0f), s + size.AsVec2, col)
-                drawLine(t, s + size.AsVec2, s + vec2(0.0f, size.height), col)
-                drawLine(t, s + vec2(0.0f, size.height), s, col)
+                | FillRect (s, size, col) -> drawIcon (white, s, size, col)
+                | DrawIcon (ie, pos)    -> drawIcon (white, pos, size2(ie.Width  |> single, ie.Height |> single), vec4(1.0f, 1.0f, 1.0f, 1.0f))
+                | DrawLine (t, s, e, col)  -> drawLine(t, s, e, col)
+                | DrawRect (t, s, size, col) ->
+                    drawLine(t, s, s + vec2(size.width, 0.0f), col)
+                    drawLine(t, s + vec2(size.width, 0.0f), s + size.AsVec2, col)
+                    drawLine(t, s + size.AsVec2, s + vec2(0.0f, size.height), col)
+                    drawLine(t, s + vec2(0.0f, size.height), s, col)
         
-        assert(queue.Count = 0)
-        tryFlush (maxVertexCount, maxTriangleCount)
+            assert(queue.Count = 0)
+            tryFlush (driver.MaxVertexCount, driver.MaxTriangleCount)
 
-        assert(state.TriCount = 0)
-        assert(state.VertexCount = 0)
+            assert(state.TriCount = 0)
+            assert(state.VertexCount = 0)
 
-        let dcCount = state.CountDC
-        state.StackIndex    <- 0    // pop all regions
-        state.CharPos       <- vec2()
-        state.CountDC       <- 0
-        driver.EndUi ()
+            let dcCount = state.CountDC
+            state.StackIndex    <- 0    // pop all regions
+            state.CharPos       <- vec2()
+            state.CountDC       <- 0
+            driver.EndUi ()
 
-        dcCount
+            dcCount
 
-    member x.Post cmd = queue.Enqueue cmd
+        member x.Post cmd = queue.Enqueue cmd
+
+let create (atlas: string, driver: IDriver) = Renderer (atlas, driver) :> ICompositor
 
 
