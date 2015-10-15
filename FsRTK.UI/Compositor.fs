@@ -206,18 +206,19 @@ type private RendererState = {
 type Command =
     | PushRegion    of Box
     | PopRegion
-    | DrawString    of vec2 * color4 * FontData * string   
+    | DrawString    of FontData * vec2 * string * color4   
     | FillRect      of vec2 * size2 * color4
     | DrawLine      of single * vec2 * vec2 * color4
     | DrawRect      of single * vec2 * size2 * color4
     | DrawIcon      of IconData * vec2
+    | DrawWidget    of WidgetData * vec2 * size2
 
 type ICompositor =
     abstract member TryGetFont      : string -> FontData option
     abstract member PresentAndReset : unit -> int
     abstract member Post            : Command -> unit
 
-type private Renderer(atlas: string, driver: IDriver) =
+type private CompositorImpl(atlas: string, driver: IDriver) =
     let atlas   = Theme.fromFile atlas
     let uiImage = atlas.ImageName
     let white   = atlas.Icons.["white"]
@@ -418,7 +419,7 @@ type private Renderer(atlas: string, driver: IDriver) =
                 match queue.Dequeue() with
                 | PushRegion b  -> state.Push b
                 | PopRegion     -> state.Pop |> ignore
-                | DrawString (pos, col, fe, str) ->
+                | DrawString (fe, pos, str, col) ->
                     drawString (state, fe, 1.0f) pos col str
                     state.CharPos       <- vec2()
 
@@ -430,6 +431,7 @@ type private Renderer(atlas: string, driver: IDriver) =
                     drawLine(t, s + vec2(size.width, 0.0f), s + size.AsVec2, col)
                     drawLine(t, s + size.AsVec2, s + vec2(0.0f, size.height), col)
                     drawLine(t, s + vec2(0.0f, size.height), s, col)
+                | DrawWidget _ -> failwith "not implemented"
         
             assert(queue.Count = 0)
             tryFlush (driver.MaxVertexCount, driver.MaxTriangleCount)
@@ -447,6 +449,6 @@ type private Renderer(atlas: string, driver: IDriver) =
 
         member x.Post cmd = queue.Enqueue cmd
 
-let create (atlas: string, driver: IDriver) = Renderer (atlas, driver) :> ICompositor
+let create (atlas: string, driver: IDriver) = CompositorImpl (atlas, driver) :> ICompositor
 
 
