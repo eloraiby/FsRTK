@@ -298,20 +298,20 @@ type private CompositorImpl(atlas: string, driver: IDriver) =
         
         addVertsTris(4, 2)
         
-    let drawIcon (ie: IconData, pos: vec2, size: size2, uvOff: vec2, col: color4) =
+    let drawTexturedBox (b: rect, tc: vec2 * vec2, col: color4) =
         tryFlush (4, 2)
 
-        let uv0 = tcoordToUV(ie.TCoordX, ie.TCoordY)
-        let uv1 = tcoordToUV(ie.TCoordX + ie.Width, ie.TCoordY + ie.Height)
-
-        let u0, v0  = uv0.x + uvOff.x, uv0.y + uvOff.y
-        let u1, v1  = uv1.x - uvOff.x, uv1.y - uvOff.y
+        let u0v0, u1v1 = tc
+        let u0 = u0v0.x
+        let v0 = u0v0.y
+        let u1 = u1v1.x
+        let v1 = u1v1.y
 
         let x0, y0, x1, y1 =
-            pos.x,
-            pos.y,
-            pos.x + size.width,
-            pos.y + size.height
+            b.position.x,
+            b.position.y,
+            b.position.x + b.size.width,
+            b.position.y + b.size.height
 
         let verts =
             [| Vertex(vec2(x0, y0), vec2(u0, v0), col)
@@ -339,6 +339,18 @@ type private CompositorImpl(atlas: string, driver: IDriver) =
 
         
         addVertsTris(4, 2)
+
+
+    let drawIcon (ie: IconData, pos: vec2, size: size2, uvOff: vec2, col: color4) =
+        tryFlush (4, 2)
+
+        let uv0 = tcoordToUV(ie.TCoordX, ie.TCoordY)
+        let uv1 = tcoordToUV(ie.TCoordX + ie.Width, ie.TCoordY + ie.Height)
+
+        let u0v0  = vec2(uv0.x + uvOff.x, uv0.y + uvOff.y)
+        let u1v1  = vec2(uv1.x - uvOff.x, uv1.y - uvOff.y)
+        drawTexturedBox (rect(pos, size), (u0v0, u1v1), col)
+
 
     let drawChar (fe: FontData, col: color4, scale: single) (ch: char) =
         tryFlush (4, 2)
