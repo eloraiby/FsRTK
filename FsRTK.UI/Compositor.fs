@@ -413,7 +413,43 @@ type private CompositorImpl(atlas: string, driver: IDriver) =
             then state.CharPos <- vec2(pos.x, state.CharPos.y + scale * (font.Size |> single))
             else drawChar (font, col, scale) ch
           
-    //let drawWidget (rs: CompositorState, widget)
+    let drawWidget (widget: WidgetData, pos: vec2, size: size2) =
+        let s  = widget.TCoordX
+        let t  = widget.TCoordY
+        let w  = widget.Width
+        let h  = widget.Height
+        let h0 = t + widget.H0
+        let h1 = t + h - widget.H1
+        let v0 = s + widget.V0
+        let v1 = s + w - widget.V1
+
+        // we have 9 rectangles which are layed out as the following
+        //        V0                      V1
+        //        |                       |
+        // p0     |p1                   p2|     p3
+        //  +-----+-----------------------+-----+
+        //  |     |                       |     |
+        //  |  0  |           1           |  2  |
+        //p4+-----+-----------------------+-----+---- H0
+        //  |     |p5                   p6|     |p7
+        //  |     |                       |     |
+        //  |  3  |           4           |  5  |
+        //  |     |                       |     |
+        //  |     |p9                  p10|     |p11
+        //p8+-----+-----------------------+-----+---- H1
+        //  |  6  |           7           |  8  |
+        //  |     |                       |     |
+        //  +-----+-----------------------+-----+
+        //p12      p13                  p14     p15
+        //
+
+        let p0  = tcoordToUV(s, t)
+        let p3  = tcoordToUV(s + w, t)
+        let p12 = tcoordToUV(s, t + h)
+        let p15 = tcoordToUV(s + w, t + h)
+
+        failwith "not implemented"
+
     interface ICompositor with
         member x.TryGetFont (s: string) = state.UiAtlas.Fonts.TryFind s
 
@@ -437,7 +473,7 @@ type private CompositorImpl(atlas: string, driver: IDriver) =
                     drawLine(t, s + vec2(size.width, 0.0f), s + size.AsVec2, col)
                     drawLine(t, s + size.AsVec2, s + vec2(0.0f, size.height), col)
                     drawLine(t, s + vec2(0.0f, size.height), s, col)
-                | DrawWidget _ -> failwith "not implemented"
+                | DrawWidget (w, p, s) -> drawWidget (w, p, s)
         
             assert(queue.Count = 0)
             tryFlush (driver.MaxVertexCount, driver.MaxTriangleCount)
