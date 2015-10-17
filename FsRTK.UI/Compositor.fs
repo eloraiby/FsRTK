@@ -474,6 +474,11 @@ type private CompositorImpl(atlas: string, driver: IDriver) =
         let p6 , st6  = pos + vec2(size.width - v1, h0)     , tcoordToUV(s + w - v1, t + h0)
         let p7 , st7  = pos + vec2(size.width, h0)          , tcoordToUV(s + w, t + h0)
 
+        let p8 , st8  = pos + vec2(0.0f, size.height - h1)  , tcoordToUV(s, h + t - h1)
+        let p9 , st9  = pos + vec2(v0, size.height - h1)    , tcoordToUV(s + v0, h + t - h1)
+        let p10, st10 = pos + vec2(size.width - v1, size.height - h1)   , tcoordToUV(s + w - v1, h + t - h1)
+        let p11, st11 = pos + vec2(size.width, size.height - h1)        , tcoordToUV(s + w, h + t + h1)
+
         let p12, st12 = pos + vec2(0.0f, size.height)       , tcoordToUV(s, t + h)
         let p15, st15 = pos + vec2(size.width, size.height) , tcoordToUV(s + w, t + h)
 
@@ -481,8 +486,12 @@ type private CompositorImpl(atlas: string, driver: IDriver) =
         let r1 = rect.fromTo (p1, p6) in drawTexturedBox (r1, (st1, st6), color4(1.0f, 1.0f, 1.0f, 1.0f))
         let r2 = rect.fromTo (p2, p7) in drawTexturedBox (r2, (st2, st7), color4(1.0f, 1.0f, 1.0f, 1.0f))
 
-        let rB = rect.fromTo (p4, p15)
-        drawTexturedBox (rB, (st4, st15), color4(1.0f, 1.0f, 1.0f, 1.0f))
+        let r3 = rect.fromTo (p4, p9)  in drawTexturedBox (r3, (st4, st9),  color4(1.0f, 1.0f, 1.0f, 1.0f))
+        let r4 = rect.fromTo (p5, p10) in drawTexturedBox (r4, (st5, st10), color4(1.0f, 1.0f, 1.0f, 1.0f))
+        let r5 = rect.fromTo (p6, p11) in drawTexturedBox (r5, (st6, st11), color4(1.0f, 1.0f, 1.0f, 1.0f))
+
+        let rB = rect.fromTo (p8, p15)
+        drawTexturedBox (rB, (st8, st15), color4(1.0f, 1.0f, 1.0f, 1.0f))
 
     interface ICompositor with
         member x.TryGetFont (s: string) = state.UiAtlas.Fonts.TryFind s
