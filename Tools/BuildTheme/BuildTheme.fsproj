@@ -30,7 +30,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DocumentationFile>bin\Debug\BuildTheme.XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
-    <StartArguments>--theme test --build-to test 512 512 --add-font Fonts/DroidSans.ttf 12 antialias --add-font Fonts/DroidSans-Bold.ttf 12 antialias --add-icon Icons/white.png --add-widget Widgets/frame.active.png 4 4 24 4 --draw-bounds</StartArguments>
+    <StartArguments>--theme test --build-to test 512 512 --add-font Fonts/DroidSans.ttf 12 antialias --add-font Fonts/DroidSans-Bold.ttf 12 antialias --add-icon Icons/white.png --add-widget Widgets/frame.active.png 4 4 24 4 --add-widget Widgets/button.normal.png 4 4 4 4 --add-widget Widgets/button.hot.png 4 4 4 4  --add-widget Widgets/button.disabled.png 4 4 4 4  --add-widget Widgets/button.active.png 4 4 4 4</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -84,6 +84,18 @@
     <Content Include="Icons\white.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Widgets\button.active.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Widgets\button.disabled.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Widgets\button.hot.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Widgets\button.normal.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Argu">

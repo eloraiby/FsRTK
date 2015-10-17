@@ -35,30 +35,56 @@ let main argv =
 
     let window = Glfw3.createWindow (800, 640, "Test UI", None, None)
     Glfw3.makeContextCurrent window
+    Glfw3.swapInterval 1
+
     let atlas = Theme.fromFile "test.atlas"
     let uiDriver = new Ui.Gles2Driver.OpenGLDriver (65535, 8096) :> Ui.Compositor.IDriver
     let uiCompositor = Ui.Compositor.create ("test.atlas", uiDriver)
     let droid12 = uiCompositor.TryGetFont "DroidSans-antialias-12"
 
     let frame = uiCompositor.TryGetWidget "frame.active" 
+    let buttonActive = uiCompositor.TryGetWidget "button.active"
+    let buttonHot    = uiCompositor.TryGetWidget "button.hot"
+    let buttonNormal = uiCompositor.TryGetWidget "button.normal"
+    let buttonDisabled = uiCompositor.TryGetWidget "button.disabled"
 
     while Glfw3.windowShouldClose window |> not do
+
         glClearColor (0.0f, 0.0f, 0.0f, 0.0f)
         glClear ((GLenum.GL_COLOR_BUFFER_BIT ||| GLenum.GL_DEPTH_BUFFER_BIT) |> int)
 
         let width, height = Glfw3.getWindowSize window
+        let mx, my = Glfw3.getCursorPos window
         glViewport (0, 0, width, height)
         //uiCompositor.Post (Ui.Compositor.Command.FillRect (vec2(0.0f, 0.0f), size2(width |> single, height |> single), color4(0.0f, 1.0f, 0.0f, 1.0f)))
         uiCompositor.Post (Ui.Compositor.PushRegion (Ui.Compositor.Box (0.0f, 0.0f, width |> single, height |> single)))
         uiCompositor.Post (Ui.Compositor.Command.DrawString (droid12.Value, vec2(100.0f, 100.0f), "Hello World", color4(1.0f, 1.0f, 1.0f, 1.0f)))
         //uiCompositor.Post (Ui.Compositor.Command.DrawLine (0.25f, vec2(50.0f, 50.0f), vec2(750.0f, 600.0f), color4(1.0f, 0.0f, 0.0f, 1.0f)))
         match frame with
-        | Some frame -> uiCompositor.Post (Ui.Compositor.Command.DrawWidget (frame, vec2(150.0f, 50.0f), size2(250.0f, 250.0f)))
+        | Some frame -> uiCompositor.Post (Ui.Compositor.Command.DrawWidget (frame, vec2(mx |> single, my |> single), size2(250.0f, 250.0f)))
         | _ -> ()
+
+        match buttonActive with
+        | Some buttonActive -> uiCompositor.Post (Ui.Compositor.Command.DrawWidget (buttonActive, vec2((mx |> single) + 50.0f, (my |> single) + 48.0f), size2(45.0f, 16.0f)))
+        | _ -> ()
+
+        match buttonNormal with
+        | Some buttonNormal -> uiCompositor.Post (Ui.Compositor.Command.DrawWidget (buttonNormal, vec2((mx |> single) + 50.0f, (my |> single) + 64.0f), size2(150.0f, 16.0f)))
+        | _ -> ()
+
+        match buttonHot with
+        | Some buttonHot -> uiCompositor.Post (Ui.Compositor.Command.DrawWidget (buttonHot, vec2((mx |> single) + 50.0f, (my |> single) + 98.0f), size2(45.0f, 16.0f)))
+        | _ -> ()
+
+        match buttonDisabled with
+        | Some buttonDisabled -> uiCompositor.Post (Ui.Compositor.Command.DrawWidget (buttonDisabled, vec2((mx |> single) + 50.0f, (my |> single) + 128.0f), size2(150.0f, 16.0f)))
+        | _ -> ()
+
         uiCompositor.PresentAndReset () |> ignore
 
         Glfw3.swapBuffers window
-        Glfw3.pollEvents ()
+        //Glfw3.pollEvents ()
+        Glfw3.waitEvents ()
         
     Glfw3.destroyWindow window
 
