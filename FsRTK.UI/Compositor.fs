@@ -244,8 +244,7 @@ type private CompositorImpl(atlas: string, driver: IDriver) =
             state.TriCount      <- 0
             state.CountDC       <- state.CountDC + 1
 
-    let tcoordToUV(posX: int, posY: int) : vec2 =
-        vec2((posX |> single) / imWidth, (posY |> single) / imHeight)
+    let tcoordToUV(posX: single, posY: single) : vec2 = vec2(posX / imWidth, posY  / imHeight)
 
     let compVec3 (v: vec2) =
         let z = (state.TriCount |> single) / (single driver.MaxTriangleCount)
@@ -258,8 +257,8 @@ type private CompositorImpl(atlas: string, driver: IDriver) =
     let drawLine (t: single, s: vec2, e: vec2, col: color4) =
         tryFlush (4, 2)
 
-        let wX  = white.TCoordX + white.Width / 2
-        let wY  = white.TCoordY + white.Height / 2
+        let wX  = white.TCoordX + white.Width / 2  |> single
+        let wY  = white.TCoordY + white.Height / 2 |> single
         let uv = tcoordToUV(wX, wY)
 
         let dir = e - s
@@ -345,8 +344,13 @@ type private CompositorImpl(atlas: string, driver: IDriver) =
     let drawIcon (ie: IconData, pos: vec2, size: size2, uvOff: vec2, col: color4) =
         tryFlush (4, 2)
 
-        let uv0 = tcoordToUV(ie.TCoordX, ie.TCoordY)
-        let uv1 = tcoordToUV(ie.TCoordX + ie.Width, ie.TCoordY + ie.Height)
+        let tx = ie.TCoordX |> single
+        let ty = ie.TCoordY |> single
+        let w  = ie.Width   |> single
+        let h  = ie.Height  |> single
+
+        let uv0 = tcoordToUV(tx, ty)
+        let uv1 = tcoordToUV(tx + w, ty + h)
 
         let u0v0  = vec2(uv0.x + uvOff.x, uv0.y + uvOff.y)
         let u1v1  = vec2(uv1.x - uvOff.x, uv1.y - uvOff.y)
@@ -357,6 +361,10 @@ type private CompositorImpl(atlas: string, driver: IDriver) =
         tryFlush (4, 2)
 
         let chInfo  = fe.CodePoints.[ch |> int]
+        let chTx    = chInfo.TCoordX |> single
+        let chTy    = chInfo.TCoordY |> single
+        let chW     = chInfo.Width   |> single
+        let chH     = chInfo.Height  |> single
         let x, y    = state.CharPos.x + (chInfo.Left |> single), state.CharPos.y + scale * ((fe.Size +  - chInfo.Top) |> single)
 
         let region = state.Top
@@ -369,8 +377,8 @@ type private CompositorImpl(atlas: string, driver: IDriver) =
 
             let uv0, uv1 =
                 let offset = vec2(0.0f, 0.0f) //vec2(0.5f / imWidth, 0.5f / imHeight)
-                tcoordToUV(chInfo.TCoordX, chInfo.TCoordY) + offset,
-                tcoordToUV(chInfo.TCoordX + chInfo.Width, chInfo.TCoordY + chInfo.Height) - offset
+                tcoordToUV(chTx, chTy) + offset,
+                tcoordToUV(chTx + chW, chTy + chH) - offset
 
             Vertex(vec2(x0, y0), uv0, col),
             Vertex(vec2(x1, y1), uv1, col)
@@ -427,14 +435,14 @@ type private CompositorImpl(atlas: string, driver: IDriver) =
             else drawChar (font, col, scale) ch
           
     let drawWidget (widget: WidgetData, pos: vec2, size: size2) =
-        let s  = widget.TCoordX
-        let t  = widget.TCoordY
-        let w  = widget.Width
-        let h  = widget.Height
-        let h0 = t + widget.H0
-        let h1 = t + h - widget.H1
-        let v0 = s + widget.V0
-        let v1 = s + w - widget.V1
+        let s  = widget.TCoordX    |> single
+        let t  = widget.TCoordY    |> single
+        let w  = widget.Width      |> single
+        let h  = widget.Height     |> single
+        let h0 = widget.H0 |> single//t + (widget.H0 |> single)      |> single
+        let h1 = widget.H1 |> single//t + h - (widget.H1 |> single)  |> single
+        let v0 = widget.V0 |> single//s + (widget.V0 |> single)      |> single
+        let v1 = widget.V1 |> single//s + w - (widget.V1 |> single)  |> single
 
         // we have 9 rectangles which are layed out as the following
         //        V0                      V1
@@ -456,13 +464,25 @@ type private CompositorImpl(atlas: string, driver: IDriver) =
         //p12      p13                  p14     p15
         //
 
-        let st0  = tcoordToUV(s, t)
-        let st3  = tcoordToUV(s + w, t)
-        let st12 = tcoordToUV(s, t + h)
-        let st15 = tcoordToUV(s + w, t + h)
+        let p0 , st0  = pos                                 , tcoordToUV(s, t)
+        let p1 , st1  = pos + vec2(v0, 0.0f)                , tcoordToUV(s + v0, t)
+        let p2 , st2  = pos + vec2(size.width - v1, 0.0f)   , tcoordToUV(s + w - v1, t)
+        let p3 , st3  = pos + vec2(size.width, 0.0f)        , tcoordToUV(s + w, t)
 
-        let r0_8 = rect (pos, size)
-        drawTexturedBox (r0_8, (st0, st15), color4(1.0f, 1.0f, 1.0f, 1.0f))
+        let p4 , st4  = pos + vec2(0.0f, h0)                , tcoordToUV(s, t + h0)
+        let p5 , st5  = pos + vec2(v0, h0)                  , tcoordToUV(s + v0, t + h0)
+        let p6 , st6  = pos + vec2(size.width - v1, h0)     , tcoordToUV(s + w - v1, t + h0)
+        let p7 , st7  = pos + vec2(size.width, h0)          , tcoordToUV(s + w, t + h0)
+
+        let p12, st12 = pos + vec2(0.0f, size.height)       , tcoordToUV(s, t + h)
+        let p15, st15 = pos + vec2(size.width, size.height) , tcoordToUV(s + w, t + h)
+
+        let r0 = rect.fromTo (p0, p5) in drawTexturedBox (r0, (st0, st5), color4(1.0f, 1.0f, 1.0f, 1.0f))
+        let r1 = rect.fromTo (p1, p6) in drawTexturedBox (r1, (st1, st6), color4(1.0f, 1.0f, 1.0f, 1.0f))
+        let r2 = rect.fromTo (p2, p7) in drawTexturedBox (r2, (st2, st7), color4(1.0f, 1.0f, 1.0f, 1.0f))
+
+        let rB = rect.fromTo (p4, p15)
+        drawTexturedBox (rB, (st4, st15), color4(1.0f, 1.0f, 1.0f, 1.0f))
 
     interface ICompositor with
         member x.TryGetFont (s: string) = state.UiAtlas.Fonts.TryFind s

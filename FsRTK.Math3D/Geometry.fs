@@ -93,6 +93,8 @@ type rect = struct
     member x.Width = x.size.width
     member x.Height = x.size.height
 
+    static member fromTo (start: vec2, endp: vec2) = rect(start, size2(endp.x - start.x, endp.y - start.y))
+
     end
 
 type irect = struct
