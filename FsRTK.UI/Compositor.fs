@@ -477,10 +477,12 @@ type private CompositorImpl(atlas: string, driver: IDriver) =
         let p8 , st8  = pos + vec2(0.0f, size.height - h1)  , tcoordToUV(s, h + t - h1)
         let p9 , st9  = pos + vec2(v0, size.height - h1)    , tcoordToUV(s + v0, h + t - h1)
         let p10, st10 = pos + vec2(size.width - v1, size.height - h1)   , tcoordToUV(s + w - v1, h + t - h1)
-        let p11, st11 = pos + vec2(size.width, size.height - h1)        , tcoordToUV(s + w, h + t + h1)
+        let p11, st11 = pos + vec2(size.width, size.height - h1)        , tcoordToUV(s + w, h + t - h1)
 
-        let p12, st12 = pos + vec2(0.0f, size.height)       , tcoordToUV(s, t + h)
-        let p15, st15 = pos + vec2(size.width, size.height) , tcoordToUV(s + w, t + h)
+        let p12, st12 = pos + vec2(0.0f, size.height)       , tcoordToUV(s, h + t)
+        let p13, st13 = pos + vec2(v0, size.height)         , tcoordToUV(s + v0, h + t)
+        let p14, st14 = pos + vec2(size.width - v1, size.height)   , tcoordToUV(s + w - v1, h + t)
+        let p15, st15 = pos + vec2(size.width, size.height) , tcoordToUV(s + w, h + t)
 
         let r0 = rect.fromTo (p0, p5) in drawTexturedBox (r0, (st0, st5), color4(1.0f, 1.0f, 1.0f, 1.0f))
         let r1 = rect.fromTo (p1, p6) in drawTexturedBox (r1, (st1, st6), color4(1.0f, 1.0f, 1.0f, 1.0f))
@@ -490,8 +492,10 @@ type private CompositorImpl(atlas: string, driver: IDriver) =
         let r4 = rect.fromTo (p5, p10) in drawTexturedBox (r4, (st5, st10), color4(1.0f, 1.0f, 1.0f, 1.0f))
         let r5 = rect.fromTo (p6, p11) in drawTexturedBox (r5, (st6, st11), color4(1.0f, 1.0f, 1.0f, 1.0f))
 
-        let rB = rect.fromTo (p8, p15)
-        drawTexturedBox (rB, (st8, st15), color4(1.0f, 1.0f, 1.0f, 1.0f))
+        let r6 = rect.fromTo (p8, p13)  in drawTexturedBox (r6, (st8, st13),  color4(1.0f, 1.0f, 1.0f, 1.0f))
+        let r7 = rect.fromTo (p9, p14)  in drawTexturedBox (r7, (st9, st14), color4(1.0f, 1.0f, 1.0f, 1.0f))
+        let r8 = rect.fromTo (p10, p15) in drawTexturedBox (r8, (st10, st15), color4(1.0f, 1.0f, 1.0f, 1.0f))
+
 
     interface ICompositor with
         member x.TryGetFont (s: string) = state.UiAtlas.Fonts.TryFind s
