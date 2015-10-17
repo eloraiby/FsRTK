@@ -86,7 +86,7 @@ type OpenGLDriver(maxVertexCount: int, maxTriangleCount: int) =
         glTexParameteri(GLenum.GL_TEXTURE_2D, GLenum.GL_TEXTURE_WRAP_T, GLenum.GL_CLAMP_TO_EDGE |> int)
         glTexParameteri(GLenum.GL_TEXTURE_2D, GLenum.GL_TEXTURE_MAG_FILTER, GLenum.GL_LINEAR |> int)
         glTexParameteri(GLenum.GL_TEXTURE_2D, GLenum.GL_TEXTURE_MIN_FILTER, GLenum.GL_LINEAR |> int)
-        glTexImage2DPtr(GLenum.GL_TEXTURE_2D, 0, GLenum.GL_RGBA |> int, bmpData.Width, bmpData.Height, 0, GLenum.GL_RGBA, GLenum.GL_UNSIGNED_BYTE, bmpData.Scan0)
+        glTexImage2DPtr(GLenum.GL_TEXTURE_2D, 0, GLenum.GL_RGBA |> int, bmpData.Width, bmpData.Height, 0, GLenum.GL_BGRA_EXT, GLenum.GL_UNSIGNED_BYTE, bmpData.Scan0)
 
         atlasImage.UnlockBits bmpData
 

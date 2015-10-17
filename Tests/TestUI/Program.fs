@@ -40,16 +40,21 @@ let main argv =
     let uiCompositor = Ui.Compositor.create ("test.atlas", uiDriver)
     let droid12 = uiCompositor.TryGetFont "DroidSans-antialias-12"
 
+    let frame = uiCompositor.TryGetWidget "frame.active" 
+
     while Glfw3.windowShouldClose window |> not do
         glClearColor (0.0f, 0.0f, 0.0f, 0.0f)
         glClear ((GLenum.GL_COLOR_BUFFER_BIT ||| GLenum.GL_DEPTH_BUFFER_BIT) |> int)
 
         let width, height = Glfw3.getWindowSize window
         glViewport (0, 0, width, height)
-        uiCompositor.Post (Ui.Compositor.Command.FillRect (vec2(0.0f, 0.0f), size2(width |> single, height |> single), color4(0.0f, 1.0f, 0.0f, 1.0f)))
+        //uiCompositor.Post (Ui.Compositor.Command.FillRect (vec2(0.0f, 0.0f), size2(width |> single, height |> single), color4(0.0f, 1.0f, 0.0f, 1.0f)))
         uiCompositor.Post (Ui.Compositor.PushRegion (Ui.Compositor.Box (0.0f, 0.0f, width |> single, height |> single)))
         uiCompositor.Post (Ui.Compositor.Command.DrawString (droid12.Value, vec2(100.0f, 100.0f), "Hello World", color4(1.0f, 1.0f, 1.0f, 1.0f)))
-        uiCompositor.Post (Ui.Compositor.Command.DrawLine (0.25f, vec2(50.0f, 50.0f), vec2(750.0f, 600.0f), color4(1.0f, 0.0f, 0.0f, 1.0f)))
+        //uiCompositor.Post (Ui.Compositor.Command.DrawLine (0.25f, vec2(50.0f, 50.0f), vec2(750.0f, 600.0f), color4(1.0f, 0.0f, 0.0f, 1.0f)))
+        match frame with
+        | Some frame -> uiCompositor.Post (Ui.Compositor.Command.DrawWidget (frame, vec2(150.0f, 50.0f), size2(250.0f, 250.0f)))
+        | _ -> ()
         uiCompositor.PresentAndReset () |> ignore
 
         Glfw3.swapBuffers window

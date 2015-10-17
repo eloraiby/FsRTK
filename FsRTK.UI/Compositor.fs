@@ -215,6 +215,7 @@ type Command =
 
 type ICompositor =
     abstract member TryGetFont      : string -> FontData option
+    abstract member TryGetWidget    : string -> WidgetData option
     abstract member PresentAndReset : unit -> int
     abstract member Post            : Command -> unit
 
@@ -465,6 +466,7 @@ type private CompositorImpl(atlas: string, driver: IDriver) =
 
     interface ICompositor with
         member x.TryGetFont (s: string) = state.UiAtlas.Fonts.TryFind s
+        member x.TryGetWidget (s: string) = state.UiAtlas.Widgets.TryFind s
 
         member x.PresentAndReset() =
             driver.BeginUi ()

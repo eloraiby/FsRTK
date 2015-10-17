@@ -325,6 +325,8 @@ type GLenum =
     | GL_MAX_RENDERBUFFER_SIZE          = 0x84E8
     | GL_INVALID_FRAMEBUFFER_OPERATION  = 0x0506
 
+    | GL_BGRA_EXT                       = 0x80E1
+
 [<AutoOpen>]
 module private Native = 
     [<Literal>]

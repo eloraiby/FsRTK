@@ -51,7 +51,7 @@ module Source =
 
 type irect
 with
-    member x.Rectangle = Rectangle(x.X, x.Y, x.Width, x.Height)
+    member x.Rectangle = Rectangle(x.X, x.Y, x.Width - 1, x.Height - 1)
 
 let getExtension str = Path.GetExtension str
 let stripDirectoryAndExtension str = Path.GetFileNameWithoutExtension str
@@ -156,7 +156,7 @@ let compileWidget (g: Graphics) (atlas: SkyLine.Atlas) (ropt: RectangleOption) (
         use bmp         = new Bitmap(pt (widget.FileName))
         let rect        = irect(0, 0, bmp.Width + 2, bmp.Height + 2)
         let placement   = SkyLine.insert (atlas, rect)
-        use pen         = new Pen(Color.Red)
+        use pen         = new Pen(Color.Red, -1.0f)
 
         match placement with
         | Some rect ->
