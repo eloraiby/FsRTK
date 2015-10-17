@@ -108,7 +108,7 @@ let compileFont (lib: SharpFont.Library)
                                 let dCol  = Color.FromArgb(a, 0xFF, 0xFF, 0xFF)
                                 dstBmp.SetPixel(x, y, dCol)
 
-                        g.DrawImageUnscaled(dstBmp, rect.X + 1, rect.Y + 1)
+                        g.DrawImage(dstBmp, rect.X + 1, rect.Y + 1, rect.Width - 2, rect.Height - 2)
                     
                     match ropt with
                     | DrawBounds -> g.DrawRectangle(pen, rect.Rectangle)
@@ -137,7 +137,7 @@ let compileIcon (g: Graphics) (atlas: SkyLine.Atlas) (ropt: RectangleOption) (pt
 
         match placement with
         | Some rect ->
-            g.DrawImageUnscaled(bmp, rect.X + 1, rect.Y + 1)
+            g.DrawImage(bmp, rect.X + 1, rect.Y + 1, rect.Width - 2, rect.Height - 2)
 
             match ropt with
             | DrawBounds -> g.DrawRectangle(pen, rect.Rectangle)
@@ -160,7 +160,7 @@ let compileWidget (g: Graphics) (atlas: SkyLine.Atlas) (ropt: RectangleOption) (
 
         match placement with
         | Some rect ->
-            g.DrawImageUnscaled(bmp, rect.X + 1, rect.Y + 1)
+            g.DrawImage(bmp, rect.X + 1, rect.Y + 1, rect.Width - 2, rect.Height - 2)
 
             match ropt with
             | DrawBounds -> g.DrawRectangle(pen, rect.Rectangle)

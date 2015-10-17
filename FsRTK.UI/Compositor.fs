@@ -455,12 +455,13 @@ type private CompositorImpl(atlas: string, driver: IDriver) =
         //p12      p13                  p14     p15
         //
 
-        let p0  = tcoordToUV(s, t)
-        let p3  = tcoordToUV(s + w, t)
-        let p12 = tcoordToUV(s, t + h)
-        let p15 = tcoordToUV(s + w, t + h)
+        let st0  = tcoordToUV(s, t)
+        let st3  = tcoordToUV(s + w, t)
+        let st12 = tcoordToUV(s, t + h)
+        let st15 = tcoordToUV(s + w, t + h)
 
-        failwith "not implemented"
+        let r0_8 = rect (pos, size)
+        drawTexturedBox (r0_8, (st0, st15), color4(1.0f, 1.0f, 1.0f, 1.0f))
 
     interface ICompositor with
         member x.TryGetFont (s: string) = state.UiAtlas.Fonts.TryFind s

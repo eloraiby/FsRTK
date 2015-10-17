@@ -30,7 +30,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DocumentationFile>bin\Debug\BuildTheme.XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
-    <StartArguments>--theme test --build-to test 512 512 --add-font Fonts/DroidSans.ttf 12 antialias --add-font Fonts/DroidSans-Bold.ttf 12 antialias --add-icon white.png --add-widget frame.normal.png 16 16 16 16 --draw-bounds</StartArguments>
+    <StartArguments>--theme test --build-to test 512 512 --add-font Fonts/DroidSans.ttf 12 antialias --add-font Fonts/DroidSans-Bold.ttf 12 antialias --add-icon white.png --add-widget Widgets/frame.active.png 3 3 23 4 --draw-bounds</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -78,7 +78,11 @@
     <Content Include="Fonts\DroidSans-Bold.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Widgets\frame.active.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
+  
   <ItemGroup>
     <Reference Include="Argu">
       <HintPath>..\..\packages\Argu.1.0.0\lib\net40\Argu.dll</HintPath>
