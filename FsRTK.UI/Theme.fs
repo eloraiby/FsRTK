@@ -59,7 +59,7 @@ module File =
         ImageHeight  : int
         Fonts        : (string * FontEntry)[]
         Icons        : (string * IconEntry)[]
-        Widgets      : ((string * PaintStyle) * WidgetEntry)[]
+        Widgets      : ((string * Activation) * WidgetEntry)[]
     }
 
 //------------------------------------------------------------------------------

@@ -35,7 +35,7 @@ type Slider = {
     Val : single
 }
 
-type PaintStyle =
+type Activation =
     | Hot
     | Active
     | Normal
@@ -79,7 +79,7 @@ and WidgetInstance =
     | Collapse  of Label * CollapseState * Widget[]
     | Layout    of Layout
 
-and Widget = Widget of PaintStyle * WidgetInstance
+and Widget = Widget of Activation * WidgetInstance
 
 and WidgetType =
     | WtLabel      
@@ -102,7 +102,7 @@ with
 
 and Theme = {
     Name        : string
-    Widgets     : Map<WidgetType * PaintStyle, Base.WidgetData>
+    Widgets     : Map<WidgetType * Activation, Base.WidgetData>
     Present     : (rect * Widget)[] -> unit
     ComputeSize : Widget -> size2
 }
@@ -134,7 +134,7 @@ type Frame = {
     Layout      : Layout
 }
 
-type PaintStyle
+type Activation
 with
     static member parse str =
         match str with
@@ -142,7 +142,7 @@ with
         | "active"     -> Active
         | "normal"     -> Normal
         | "disabled"   -> Disabled
-        | _ -> failwith "invalid WidgetState case to parse"
+        | _ -> failwith "invalid Activation case to parse"
 
 type WidgetType
 with
@@ -159,9 +159,9 @@ with
 
   
 
-let widgetTypeAndState (str: string) =
+let widgetTypeAndActivation (str: string) =
     match str.Split('.') with
-    | [| wt; ws |] -> wt, ws |> PaintStyle.parse
+    | [| wt; ws |] -> wt, ws |> Activation.parse
     | _            -> failwith "invalid widget type and/or state"
 
 type Widget

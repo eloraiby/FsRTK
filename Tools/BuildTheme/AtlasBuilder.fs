@@ -231,7 +231,7 @@ let buildAtlas (ftLib: SharpFont.Library) (themeName: string) (size: isize2) (ro
         srcAtlas.Widgets
         |> Array.map (fun w ->
             let name = stripDirectoryAndExtension w.FileName
-            let state = (name |> Path.GetExtension).[1..] |> PaintStyle.parse
+            let state = (name |> Path.GetExtension).[1..] |> Activation.parse
             let name = stripDirectoryAndExtension name
 
             (name, state), compileWidget g slAtlas ropt getPath w)
