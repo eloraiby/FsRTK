@@ -59,7 +59,7 @@ module File =
         ImageHeight  : int
         Fonts        : (string * FontEntry)[]
         Icons        : (string * IconEntry)[]
-        Widgets      : ((string * WidgetState) * WidgetEntry)[]
+        Widgets      : ((string * PaintStyle) * WidgetEntry)[]
     }
 
 //------------------------------------------------------------------------------
@@ -107,13 +107,13 @@ type Theme
 with
     static member contentSize (wid: Widget) : size2 =
         match wid with
-        | Label     _ -> failwith "not implemented"
-        | Checkbox  _ -> failwith "not implemented"
-        | Radiobox  _ -> failwith "not implemented"
-        | Button    _ -> failwith "not implemented"
-        | HSlider   _ -> failwith "not implemented"
-        | Collapse  _ -> failwith "not implemented"
-        | Layout    _ -> failwith "not implemented"
+        | Widget (ps, Label     _) -> failwith "not implemented"
+        | Widget (ps, Checkbox  _) -> failwith "not implemented"
+        | Widget (ps, Radiobox  _) -> failwith "not implemented"
+        | Widget (ps, Button    _) -> failwith "not implemented"
+        | Widget (ps, HSlider   _) -> failwith "not implemented"
+        | Widget (ps, Collapse  _) -> failwith "not implemented"
+        | Widget (ps, Layout    _) -> failwith "not implemented"
 
     static member fromFile filename =
         use f = System.IO.File.OpenText filename

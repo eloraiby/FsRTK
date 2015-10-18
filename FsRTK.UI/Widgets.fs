@@ -35,7 +35,7 @@ type Slider = {
     Val : single
 }
 
-type WidgetState =
+type PaintStyle =
     | Hot
     | Active
     | Normal
@@ -46,7 +46,14 @@ with
         | Hot       -> "hot"       
         | Active    -> "active"    
         | Normal    -> "normal"    
-        | Disabled  -> "disabled"  
+        | Disabled  -> "disabled"
+
+    member x.toInputReception =
+        match x with
+        | Hot       
+        | Active    
+        | Normal    -> Accept  
+        | Disabled  -> Discard
 
 type Label = {
     Font    : Font
@@ -63,14 +70,16 @@ type Layout = {
     Apply   : size2 * Widget [] -> rect[]
 }
 
-and Widget =
-    | Label     of InputReception * Label
-    | Checkbox  of InputReception * Label * bool
-    | Radiobox  of InputReception * Label * (InputReception * string * bool) []
-    | Button    of InputReception * Label * bool
-    | HSlider   of InputReception * Slider
-    | Collapse  of InputReception * Label * CollapseState * Widget[]
-    | Layout    of InputReception * Layout
+and WidgetInstance =
+    | Label     of Label
+    | Checkbox  of Label * bool
+    | Radiobox  of Label * (string * bool) []
+    | Button    of Label * bool
+    | HSlider   of Slider
+    | Collapse  of Label * CollapseState * Widget[]
+    | Layout    of Layout
+
+and Widget = Widget of PaintStyle * WidgetInstance
 
 and WidgetType =
     | WtLabel      
@@ -93,7 +102,7 @@ with
 
 and Theme = {
     Name        : string
-    Widgets     : Map<WidgetType * WidgetState, Base.WidgetData>
+    Widgets     : Map<WidgetType * PaintStyle, Base.WidgetData>
     Present     : (rect * Widget)[] -> unit
     ComputeSize : Widget -> size2
 }
@@ -125,7 +134,7 @@ type Frame = {
     Layout      : Layout
 }
 
-type WidgetState
+type PaintStyle
 with
     static member parse str =
         match str with
@@ -152,17 +161,9 @@ with
 
 let widgetTypeAndState (str: string) =
     match str.Split('.') with
-    | [| wt; ws |] -> wt, ws |> WidgetState.parse
+    | [| wt; ws |] -> wt, ws |> PaintStyle.parse
     | _            -> failwith "invalid widget type and/or state"
 
 type Widget
 with
-    member x.InputReception =
-        match x with
-        | Label     (ir, _)       -> ir
-        | Checkbox  (ir, _, _)    -> ir
-        | Radiobox  (ir, _, _)    -> ir
-        | Button    (ir, _, _)    -> ir
-        | HSlider   (ir, _)       -> ir
-        | Collapse  (ir, _, _, _) -> ir
-        | Layout    (ir, _)       -> ir
+    member x.InputReception = match x with Widget (ps, _) -> ps.toInputReception
