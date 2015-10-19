@@ -167,3 +167,6 @@ let widgetTypeAndActivation (str: string) =
 type Widget
 with
     member x.InputReception = match x with Widget (ps, _) -> ps.toInputReception
+    member x.Unbox = unbox x
+    static member unbox (Widget (a, wi)) = a, wi
+
