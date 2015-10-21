@@ -18,6 +18,8 @@
 
 module FsRTK.Ui.Widgets
 
+open System
+
 open FsRTK
 open FsRTK.Math3D.Vector
 open FsRTK.Math3D.Matrix
@@ -35,7 +37,7 @@ type Slider = {
     Val : single
 }
 
-type Activation =
+type PaintStyle =
     | Hot
     | Active
     | Normal
@@ -48,13 +50,6 @@ with
         | Normal    -> "normal"    
         | Disabled  -> "disabled"
 
-    member x.toInputReception =
-        match x with
-        | Hot       
-        | Active    
-        | Normal    -> Accept  
-        | Disabled  -> Discard
-
 type Label = {
     Font    : Font
     Caption : string
@@ -64,22 +59,59 @@ type CollapseState =
     | Collapsed
     | Expanded
 
-type Layout = {
-    Widgets : Widget []
-    ComputeSize : Theme * Widget -> size2
-    Apply   : size2 * Widget [] -> rect[]
+type Layout = size2 * (Widget * size2) [] -> rect[]
+
+and Container = {
+    Widgets     : Widget []
+
+    ActiveWidget: Widget option
+    HotWidget   : Widget option
+    Deactivated : Widget []
+
+    Layout      : Layout
+
+    Positions   : rect []
 }
 
-and WidgetInstance =
-    | Label     of Label
-    | Checkbox  of Label * bool
-    | Radiobox  of Label * (string * bool) []
-    | Button    of Label * bool
-    | HSlider   of Slider
-    | Collapse  of Label * CollapseState * Widget[]
-    | Layout    of Layout
 
-and Widget = Widget of Activation * WidgetInstance
+and [<CustomComparison; CustomEquality>] Widget =
+    | Label     of Guid * Label
+    | Checkbox  of Guid * Label * bool
+    | Radiobox  of Guid * Label * (string * bool) []
+    | Button    of Guid * Label * bool
+    | HSlider   of Guid * Slider
+    | Collapse  of Guid * Label * CollapseState * Container
+    | Container of Guid * Container
+
+    with
+        member x.Guid =
+            match x with
+            | Label     (guid, _)       -> guid
+            | Checkbox  (guid, _, _)    -> guid
+            | Radiobox  (guid, _, _)    -> guid
+            | Button    (guid, _, _)    -> guid
+            | HSlider   (guid, _)       -> guid
+            | Collapse  (guid, _, _, _) -> guid
+            | Container (guid, _)       -> guid
+
+        interface IComparable<Widget> with
+            member this.CompareTo other = this.Guid.CompareTo other.Guid
+          
+        interface IComparable with
+            member this.CompareTo other =
+                match other with
+                | :? Widget as other -> (this :> IComparable<Widget>).CompareTo other
+                | _ -> failwith "other is not a Widget"
+
+        interface IEquatable<Widget> with
+            member this.Equals other = this.Guid.Equals other.Guid
+
+        override this.Equals obj =
+            match obj with
+            | :? Widget as other -> (this :> IEquatable<Widget>).Equals other
+            | _ -> failwith "obj is not a Widget"
+
+        override this.GetHashCode () = this.Guid.GetHashCode ()
 
 and WidgetType =
     | WtLabel      
@@ -88,7 +120,7 @@ and WidgetType =
     | WtButton    
     | WtHSlider   
     | WtCollapse  
-    | WtLayout
+    | WtContainer
 with
     override x.ToString () =
         match x with
@@ -98,11 +130,11 @@ with
         | WtButton   -> "button"   
         | WtHSlider  -> "hslider"  
         | WtCollapse -> "collapse" 
-        | WtLayout   -> "layout" 
+        | WtContainer-> "container" 
 
 and Theme = {
     Name        : string
-    Widgets     : Map<WidgetType * Activation, Base.WidgetData>
+    Widgets     : Map<WidgetType * PaintStyle, Base.WidgetData>
     Present     : (rect * Widget)[] -> unit
     ComputeSize : Widget -> size2
 }
@@ -134,7 +166,7 @@ type Frame = {
     Layout      : Layout
 }
 
-type Activation
+type PaintStyle
 with
     static member parse str =
         match str with
@@ -154,19 +186,14 @@ with
         | "button"    -> WtButton    
         | "hslider"   -> WtHSlider   
         | "collapse"  -> WtCollapse  
-        | "layout"    -> WtLayout
+        | "container" -> WtContainer
         | _           -> failwith "unrecognized widget type"
 
   
 
-let widgetTypeAndActivation (str: string) =
+let widgetTypeAndStyle (str: string) =
     match str.Split('.') with
-    | [| wt; ws |] -> wt, ws |> Activation.parse
+    | [| wt; ws |] -> wt, ws |> PaintStyle.parse
     | _            -> failwith "invalid widget type and/or state"
 
-type Widget
-with
-    member x.InputReception = match x with Widget (ps, _) -> ps.toInputReception
-    member x.Unbox = unbox x
-    static member unbox (Widget (a, wi)) = a, wi
 

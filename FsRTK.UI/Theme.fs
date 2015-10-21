@@ -59,7 +59,7 @@ module File =
         ImageHeight  : int
         Fonts        : (string * FontEntry)[]
         Icons        : (string * IconEntry)[]
-        Widgets      : ((string * Activation) * WidgetEntry)[]
+        Widgets      : ((string * PaintStyle) * WidgetEntry)[]
     }
 
 //------------------------------------------------------------------------------
@@ -107,13 +107,13 @@ type Theme
 with
     static member contentSize (wid: Widget) : size2 =
         match wid with
-        | Widget (ps, Label     _) -> failwith "not implemented"
-        | Widget (ps, Checkbox  _) -> failwith "not implemented"
-        | Widget (ps, Radiobox  _) -> failwith "not implemented"
-        | Widget (ps, Button    _) -> failwith "not implemented"
-        | Widget (ps, HSlider   _) -> failwith "not implemented"
-        | Widget (ps, Collapse  _) -> failwith "not implemented"
-        | Widget (ps, Layout    _) -> failwith "not implemented"
+        | Label     _ -> failwith "not implemented"
+        | Checkbox  _ -> failwith "not implemented"
+        | Radiobox  _ -> failwith "not implemented"
+        | Button    _ -> failwith "not implemented"
+        | HSlider   _ -> failwith "not implemented"
+        | Collapse  _ -> failwith "not implemented"
+        | Container _ -> failwith "not implemented"
 
     static member fromFile filename =
         use f = System.IO.File.OpenText filename
@@ -166,14 +166,13 @@ type private RenderState =
     | Normal
     | Disabled
 with
-    static member mapControlState (wid: Widget) (isHot, isActive) =
-        match wid.InputReception with
-        | InputReception.Accept ->
-            match isHot, isActive with
-            | _, true -> Active
-            | true, false -> Hot
-            | false, false -> Normal
-        | InputReception.Discard -> Disabled
+    static member mapControlState (cont: Container) (wid: Widget) =
+        match cont.ActiveWidget, cont.HotWidget with
+        | Some aw, Some hw ->
+            if aw = wid then Active
+            elif hw = wid then Hot
+            else Disabled
+        | _ -> Normal
 
 type Presenter = {
     DrawTile           : int * vec2 -> unit
