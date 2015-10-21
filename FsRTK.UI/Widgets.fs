@@ -27,10 +27,6 @@ open FsRTK.Math3D.Geometry
 
 open FsRTK.Ui.Base
 
-type InputReception =
-    | Accept
-    | Discard
-
 type Slider = {
     Min : single
     Max : single
@@ -138,7 +134,6 @@ and Theme = {
     Present     : (rect * Widget)[] -> unit
     ComputeSize : Widget -> size2
 }
-
 
 type PointerState = {
     Position    : vec2
