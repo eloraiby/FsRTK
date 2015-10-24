@@ -53,44 +53,7 @@ type Triangle =
                         | _ -> failwith "index out of range"
 
 
-[<StructAttribute>]
-type Box =
-    val Min         : vec2
-    val Max         : vec2
 
-    new(mn: vec2, mx: vec2)     =
-        let xMin = min mn.x mx.x
-        let yMin = min mn.y mx.y
-        let xMax = max mn.x mx.x
-        let yMax = max mn.y mx.y
-        { Min = vec2(xMin, yMin); Max = vec2(xMax, yMax) }
-
-    new(x, y, w, h) = Box(vec2(x, y), vec2(x + w, y + h))
-
-    member x.IsOnOrInside (p: vec2) =
-        if p.x >= x.Min.x && p.x <= x.Max.x
-           && p.y >= x.Min.y && p.y <= x.Max.y
-        then true
-        else false
-
-    member x.Width  = x.Max.x - x.Min.x
-    member x.Height = x.Max.y - x.Min.y
-    member x.Size   = x.Max - x.Min
-
-    static member intersect (a: Box) (b: Box) =
-        let xMin = max a.Min.x b.Min.x
-        let yMin = max a.Min.y b.Min.y
-        let xMax = min a.Max.x b.Max.x
-        let yMax = min a.Max.y b.Max.y
-        Box(vec2(xMin, yMin), vec2(xMax, yMax))
-
-    static member move (a: Box) (t: vec2) =
-        Box(a.Min + t, a.Max + t)
-
-    static member overlap (a: Box) (b: Box) =
-        let intersection = Box.intersect a b
-        intersection.Width <> 0.0f && intersection.Height <> 0.0f
-    
 type UiBox(vMin: Vertex, vMax: Vertex) =
     member x.Min    = vMin
     member x.Max    = vMax
@@ -100,15 +63,15 @@ type UiBox(vMin: Vertex, vMax: Vertex) =
     member x.ToBox  =
         let vmin = vMin.Position
         let vmax = vMax.Position
-        Box(vmin, vmax)
+        rect(vmin, vmax)
 
     //
     // clip a UiBox with a box (region)
     //
-    static member clip (box: Box) (uiBox: UiBox) =
+    static member clip (box: rect) (uiBox: UiBox) =
         // first check if the uiBox intersects the box
-        let box2    = Box(uiBox.Min.Position.x, uiBox.Min.Position.y, uiBox.Width, uiBox.Height)
-        if not (Box.overlap box box2)
+        let box2    = rect(uiBox.Min.Position.x, uiBox.Min.Position.y, uiBox.Width, uiBox.Height)
+        if not (rect.overlap box box2)
         then None   // not intersecting, return nothing
         else
             // we only need to clip the min and the max (reposition) since all
@@ -157,8 +120,8 @@ type private CompositorState = {
 
     Driver          : IDriver
 
-    RelRegionStack  : Box[] // relative region stack
-    AbsRegionStack  : Box[] // absolute region stack
+    RelRegionStack  : rect[] // relative region stack
+    AbsRegionStack  : rect[] // absolute region stack
 
     mutable StackIndex  : int
 
@@ -175,8 +138,8 @@ type private CompositorState = {
           
           Driver    = driver
           
-          RelRegionStack    = Array.create MAX_REGIONS (Box())
-          AbsRegionStack    = Array.create MAX_REGIONS (Box())
+          RelRegionStack    = Array.create MAX_REGIONS (rect())
+          AbsRegionStack    = Array.create MAX_REGIONS (rect())
           StackIndex    = 0
 
           CharPos   = vec2()
@@ -189,9 +152,12 @@ type private CompositorState = {
         match x.StackIndex with
         | 0 -> x.AbsRegionStack.[x.StackIndex]    <- b
         | _ ->
-            let headRegion = x.AbsRegionStack.[x.StackIndex - 1]
-            x.AbsRegionStack.[x.StackIndex]    <- Box.intersect (Box.move b headRegion.Min) headRegion
+            let headRegion : rect = x.AbsTop
+            x.AbsRegionStack.[x.StackIndex]    <- rect.intersect (rect.move b headRegion.Min) headRegion
+
         x.StackIndex <- x.StackIndex + 1
+        let tip : rect = x.AbsTop
+        printfn "- %d -> Tip At: %f, %f - %f, %f" x.StackIndex tip.X tip.Y tip.Width tip.Height
 
     member x.Pop    =
         match x.StackIndex with
@@ -202,25 +168,12 @@ type private CompositorState = {
 
     member x.Top    =
         x.RelRegionStack.[x.StackIndex - 1]
+
+    member x.AbsTop    =
+        x.AbsRegionStack.[x.StackIndex - 1]
     
-type Command =
-    | PushRegion    of Box
-    | PopRegion
-    | DrawString    of FontData * vec2 * string * color4   
-    | FillRect      of vec2 * size2 * color4
-    | DrawLine      of single * vec2 * vec2 * color4
-    | DrawRect      of single * vec2 * size2 * color4
-    | DrawIcon      of IconData * vec2
-    | DrawWidget    of WidgetData * vec2 * size2
-
-type ICompositor =
-    abstract member TryGetFont      : string -> FontData option
-    abstract member TryGetWidget    : string -> WidgetData option
-    abstract member PresentAndReset : unit -> int
-    abstract member Post            : Command -> unit
-
-type private CompositorImpl(atlas: string, driver: IDriver) =
-    let atlas   = Theme.fromFile atlas
+type private CompositorImpl(theme: Theme, driver: IDriver) =
+    let atlas   = theme.Atlas
     let uiImage = atlas.ImageName
     let white   = atlas.Icons.["white"]
     
@@ -307,38 +260,78 @@ type private CompositorImpl(atlas: string, driver: IDriver) =
         let u1 = u1v1.x
         let v1 = u1v1.y
 
+        let region = state.AbsTop
         let x0, y0, x1, y1 =
-            b.position.x,
-            b.position.y,
-            b.position.x + b.size.width,
-            b.position.y + b.size.height
+            region.position.x + b.position.x,
+            region.position.y + b.position.y,
+            region.position.x + b.position.x + b.size.width,
+            region.position.y + b.position.y + b.size.height
 
-        let verts =
-            [| Vertex(vec2(x0, y0), vec2(u0, v0), col)
-               Vertex(vec2(x1, y0), vec2(u1, v0), col)
-               Vertex(vec2(x1, y1), vec2(u1, v1), col)
-               Vertex(vec2(x0, y1), vec2(u0, v1), col) |]
+        let uiBox = UiBox(Vertex(vec2(x0, y0), vec2(u0, v0), col), Vertex(vec2(x1, y1), vec2(u1, v1), col))
+        let cpBox = UiBox.clip state.AbsRegionStack.[state.StackIndex - 1] uiBox
+        match cpBox with
+        | Some uiBox ->
+            let ve0 = uiBox.Min
+            let ve1 = uiBox.Max
 
-        let index = [| 0us; 1us; 2us; 2us; 3us; 0us |]
+            let x0, y0 = ve0.Position.x, ve0.Position.y
+            let u0, v0 = ve0.TexCoord.x, ve0.TexCoord.y
+            let x1, y1 = ve1.Position.x, ve1.Position.y
+            let u1, v1 = ve1.TexCoord.x, ve1.TexCoord.y
 
-        let vidx    = state.VertexCount |> uint16
+            let charRectVerts = 
+                [| Vertex(vec2(x0, y0), vec2(u0, v0), col)
+                   Vertex(vec2(x1, y0), vec2(u1, v0), col)
+                   Vertex(vec2(x1, y1), vec2(u1, v1), col)
+                   Vertex(vec2(x0, y1), vec2(u0, v1), col) |]
 
-        state.VB.[vidx |> int]       <- verts.[0]
-        state.VB.[(vidx |> int) + 1] <- verts.[1]
-        state.VB.[(vidx |> int) + 2] <- verts.[2]
-        state.VB.[(vidx |> int) + 3] <- verts.[3]
+            let charIndex = [| 0us; 1us; 2us; 2us; 3us; 0us |]
 
-        let tidx    = state.TriCount |> uint16
-        state.TB.[tidx |> int]            <- Triangle (vidx + index.[0],
-                                                       vidx + index.[1],
-                                                       vidx + index.[2])
+            let vidx    = state.VertexCount |> uint16
 
-        state.TB.[(tidx + 1us) |> int]    <- Triangle (vidx + index.[3],
-                                                       vidx + index.[4],
-                                                       vidx + index.[5])
+            state.VB.[vidx |> int]       <- charRectVerts.[0]
+            state.VB.[(vidx |> int) + 1] <- charRectVerts.[1]
+            state.VB.[(vidx |> int) + 2] <- charRectVerts.[2]
+            state.VB.[(vidx |> int) + 3] <- charRectVerts.[3]
+
+            let tidx    = state.TriCount |> uint16
+            state.TB.[tidx |> int]            <- Triangle (vidx + charIndex.[0],
+                                                           vidx + charIndex.[1],
+                                                           vidx + charIndex.[2])
+
+            state.TB.[(tidx + 1us) |> int]    <- Triangle (vidx + charIndex.[3],
+                                                           vidx + charIndex.[4],
+                                                           vidx + charIndex.[5])
 
         
-        addVertsTris(4, 2)
+            addVertsTris(4, 2)
+        | _ -> ()
+//        let verts =
+//            [| Vertex(vec2(x0, y0), vec2(u0, v0), col)
+//               Vertex(vec2(x1, y0), vec2(u1, v0), col)
+//               Vertex(vec2(x1, y1), vec2(u1, v1), col)
+//               Vertex(vec2(x0, y1), vec2(u0, v1), col) |]
+//
+//        let index = [| 0us; 1us; 2us; 2us; 3us; 0us |]
+//
+//        let vidx    = state.VertexCount |> uint16
+//
+//        state.VB.[vidx |> int]       <- verts.[0]
+//        state.VB.[(vidx |> int) + 1] <- verts.[1]
+//        state.VB.[(vidx |> int) + 2] <- verts.[2]
+//        state.VB.[(vidx |> int) + 3] <- verts.[3]
+//
+//        let tidx    = state.TriCount |> uint16
+//        state.TB.[tidx |> int]            <- Triangle (vidx + index.[0],
+//                                                       vidx + index.[1],
+//                                                       vidx + index.[2])
+//
+//        state.TB.[(tidx + 1us) |> int]    <- Triangle (vidx + index.[3],
+//                                                       vidx + index.[4],
+//                                                       vidx + index.[5])
+//
+//        
+//        addVertsTris(4, 2)
 
 
     let drawIcon (ie: IconData, pos: vec2, size: size2, uvOff: vec2, col: color4) =
@@ -367,7 +360,7 @@ type private CompositorImpl(atlas: string, driver: IDriver) =
         let chH     = chInfo.Height  |> single
         let x, y    = state.CharPos.x + (chInfo.Left |> single), state.CharPos.y + scale * ((fe.Size +  - chInfo.Top) |> single)
 
-        let region = state.Top
+        let region = state.AbsTop
         let v0, v1 =
             let x0, y0, x1, y1 =
                 x + region.Min.x,
@@ -427,11 +420,10 @@ type private CompositorImpl(atlas: string, driver: IDriver) =
                                   state.CharPos.y + scale * (chInfo.AdvanceY |> single))
 
     let drawString (font: FontData, scale: single) (pos: vec2) (col: color4) (s: string) =
-        printfn ""
         state.CharPos <- pos
         for ch in s do
             if ch = '\n'
-            then state.CharPos <- vec2(pos.x, state.CharPos.y + scale * (font.Size |> single))
+            then state.CharPos <- vec2(pos.x, state.CharPos.y + scale * (font.Size + 2 |> single))  // TODO: 2 pixels ? this should be absolute value of the box
             else drawChar (font, col, scale) ch
           
     let drawWidget (widget: WidgetData, pos: vec2, size: size2) =
@@ -538,7 +530,8 @@ type private CompositorImpl(atlas: string, driver: IDriver) =
             dcCount
 
         member x.Post cmd = queue.Enqueue cmd
+        member x.Theme = theme
 
-let create (atlas: string, driver: IDriver) = CompositorImpl (atlas, driver) :> ICompositor
+let create (theme: Theme, driver: IDriver) = CompositorImpl (theme, driver) :> ICompositor
 
 

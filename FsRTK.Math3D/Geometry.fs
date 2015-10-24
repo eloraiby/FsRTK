@@ -81,6 +81,7 @@ type rect = struct
 
     new(p, s)   = { position = p; size = s }
     new(x, y, w, h) = { position = vec2(x, y); size = size2(w, h) }
+    new(p0, p1: vec2) = { position = p0; size = let s = p1 - p0 in size2(s.x, s.y) }
 
     member x.Contains (p: vec2) =
         p.x >= x.position.x &&
@@ -93,6 +94,29 @@ type rect = struct
     member x.Width = x.size.width
     member x.Height = x.size.height
 
+    member x.Min    = x.position
+    member x.Max    = vec2(x.position.x + x.size.width, x.position.y + x.size.height)
+
+    member x.IsOnOrInside (p: vec2) =
+        if p.x >= x.position.x && p.x <= x.position.x + x.size.width
+           && p.y >= x.position.y && p.y <= x.position.y + x.size.height
+        then true
+        else false
+
+    static member intersect (a: rect) (b: rect) =
+        let xMin = max a.Min.x b.Min.x
+        let yMin = max a.Min.y b.Min.y
+        let xMax = min a.Max.x b.Max.x
+        let yMax = min a.Max.y b.Max.y
+        rect(vec2(xMin, yMin), vec2(xMax, yMax))
+
+    static member move (a: rect) (t: vec2) =
+        rect(a.Min + t, a.size)
+
+    static member overlap (a: rect) (b: rect) =
+        let intersection = rect.intersect a b
+        intersection.Width <> 0.0f && intersection.Height <> 0.0f
+
     static member fromTo (start: vec2, endp: vec2) = rect(start, size2(endp.x - start.x, endp.y - start.y))
 
     end
@@ -103,6 +127,7 @@ type irect = struct
 
     new(p, s)   = { position = p; size = s }
     new(x, y, w, h) = { position = ivec2(x, y); size = isize2(w, h) }
+    new(p0, p1: ivec2) = { position = p0; size = let s = p1 - p0 in isize2(s.x, s.y) }
 
     member x.Contains (p: ivec2) =
         p.x >= x.position.x &&
@@ -114,5 +139,28 @@ type irect = struct
     member x.Y      = x.position.y
     member x.Width  = x.size.width
     member x.Height = x.size.height
+
+    member x.Min    = x.position
+    member x.Max    = ivec2(x.position.x + x.size.width, x.position.y + x.size.height)
+
+    member x.IsOnOrInside (p: ivec2) =
+        if p.x >= x.position.x && p.x <= x.position.x + x.size.width
+           && p.y >= x.position.y && p.y <= x.position.y + x.size.height
+        then true
+        else false
+
+    static member intersect (a: rect) (b: rect) =
+        let xMin = max a.Min.x b.Min.x
+        let yMin = max a.Min.y b.Min.y
+        let xMax = min a.Max.x b.Max.x
+        let yMax = min a.Max.y b.Max.y
+        rect(vec2(xMin, yMin), vec2(xMax, yMax))
+
+    static member move (a: rect) (t: vec2) =
+        rect(a.Min + t, a.size)
+
+    static member overlap (a: rect) (b: rect) =
+        let intersection = rect.intersect a b
+        intersection.Width <> 0.0f && intersection.Height <> 0.0f
 
     end

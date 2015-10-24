@@ -37,9 +37,9 @@ let main argv =
     Glfw3.makeContextCurrent window
     Glfw3.swapInterval 1
 
-    let atlas = Theme.fromFile "test.atlas"
+    let theme = Theme.fromFile "test.atlas"
     let uiDriver = new Ui.Gles2Driver.OpenGLDriver (65535, 8096) :> Ui.Compositor.IDriver
-    let uiCompositor = Ui.Compositor.create ("test.atlas", uiDriver)
+    let uiCompositor = Ui.Compositor.create (theme, uiDriver)
     let droid12 = uiCompositor.TryGetFont "DroidSans-antialias-12"
 
     let frame = uiCompositor.TryGetWidget "frame.active" 
@@ -47,6 +47,9 @@ let main argv =
     let buttonHot    = uiCompositor.TryGetWidget "button.hot"
     let buttonNormal = uiCompositor.TryGetWidget "button.normal"
     let buttonDisabled = uiCompositor.TryGetWidget "button.disabled"
+
+    let label0 = match droid12 with Some fd -> Widget.label fd "Hello From Label" | _ -> failwith "font not found"
+    let button0 = match droid12 with Some fd -> Widget.button fd ("Hello From Button\nHello again" , false) | _ -> failwith "font not found"
 
     while Glfw3.windowShouldClose window |> not do
 
@@ -57,29 +60,37 @@ let main argv =
         let mx, my = Glfw3.getCursorPos window
         glViewport (0, 0, width, height)
         //uiCompositor.Post (Ui.Compositor.Command.FillRect (vec2(0.0f, 0.0f), size2(width |> single, height |> single), color4(0.0f, 1.0f, 0.0f, 1.0f)))
-        uiCompositor.Post (Ui.Compositor.PushRegion (Ui.Compositor.Box (0.0f, 0.0f, width |> single, height |> single)))
-        uiCompositor.Post (Ui.Compositor.Command.DrawString (droid12.Value, vec2(100.0f, 100.0f), "Hello World", color4(1.0f, 1.0f, 1.0f, 1.0f)))
+        uiCompositor.Post (PushRegion (rect (0.0f, 0.0f, width |> single, height |> single)))
+        let strSize = droid12.Value.StringSize "Hello World"
+        uiCompositor.Post (Command.FillRect (vec2(100.0f, 100.0f), strSize, color4(1.0f, 0.0f, 0.0f, 1.0f)))
+        uiCompositor.Post (Command.DrawString (droid12.Value, vec2(100.0f, 100.0f), "Hello World", color4(1.0f, 1.0f, 1.0f, 1.0f)))
         //uiCompositor.Post (Ui.Compositor.Command.DrawLine (0.25f, vec2(50.0f, 50.0f), vec2(750.0f, 600.0f), color4(1.0f, 0.0f, 0.0f, 1.0f)))
         match frame with
-        | Some frame -> uiCompositor.Post (Ui.Compositor.Command.DrawWidget (frame, vec2(mx |> single, my |> single), size2(250.0f, 250.0f)))
+        | Some frame ->
+            uiCompositor.Post (Command.PushRegion (rect (vec2(mx |> single, my |> single), size2(250.0f, 250.0f))))
+            uiCompositor.Post (Command.DrawWidget (frame, vec2(0.0f, 0.0f), size2(250.0f, 250.0f)))
+            theme.Draw uiCompositor (label0, PaintStyle.Normal) (rect (0.0f, 0.0f, 100.0f, 100.0f))
+            theme.Draw uiCompositor (button0, PaintStyle.Normal) (rect (16.0f, 16.0f, 200.0f, 200.0f))
+            uiCompositor.Post Command.PopRegion
         | _ -> ()
 
         match buttonActive with
-        | Some buttonActive -> uiCompositor.Post (Ui.Compositor.Command.DrawWidget (buttonActive, vec2((mx |> single) + 50.0f, (my |> single) + 48.0f), size2(45.0f, 16.0f)))
+        | Some buttonActive -> uiCompositor.Post (Command.DrawWidget (buttonActive, vec2((mx |> single) + 50.0f, (my |> single) + 48.0f), size2(45.0f, 16.0f)))
         | _ -> ()
 
         match buttonNormal with
-        | Some buttonNormal -> uiCompositor.Post (Ui.Compositor.Command.DrawWidget (buttonNormal, vec2((mx |> single) + 50.0f, (my |> single) + 64.0f), size2(150.0f, 16.0f)))
+        | Some buttonNormal -> uiCompositor.Post (Command.DrawWidget (buttonNormal, vec2((mx |> single) + 50.0f, (my |> single) + 64.0f), size2(150.0f, 16.0f)))
         | _ -> ()
 
         match buttonHot with
-        | Some buttonHot -> uiCompositor.Post (Ui.Compositor.Command.DrawWidget (buttonHot, vec2((mx |> single) + 50.0f, (my |> single) + 98.0f), size2(45.0f, 16.0f)))
+        | Some buttonHot -> uiCompositor.Post (Command.DrawWidget (buttonHot, vec2((mx |> single) + 50.0f, (my |> single) + 98.0f), size2(45.0f, 16.0f)))
         | _ -> ()
 
         match buttonDisabled with
-        | Some buttonDisabled -> uiCompositor.Post (Ui.Compositor.Command.DrawWidget (buttonDisabled, vec2((mx |> single) + 50.0f, (my |> single) + 128.0f), size2(150.0f, 16.0f)))
+        | Some buttonDisabled -> uiCompositor.Post (Command.DrawWidget (buttonDisabled, vec2((mx |> single) + 50.0f, (my |> single) + 128.0f), size2(150.0f, 16.0f)))
         | _ -> ()
 
+        uiCompositor.Post Command.PopRegion
         uiCompositor.PresentAndReset () |> ignore
 
         Glfw3.swapBuffers window

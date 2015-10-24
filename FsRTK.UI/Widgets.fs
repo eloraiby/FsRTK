@@ -47,13 +47,16 @@ with
         | Disabled  -> "disabled"
 
 type Label = {
-    Font    : Font
+    Font    : FontData
     Caption : string
 }
 
 type CollapseState =
     | Collapsed
     | Expanded
+
+[<MeasureAttribute>] type WidM
+type Wid = int<WidM>
 
 type Layout = size2 * (Widget * size2) [] -> rect[]
 
@@ -69,29 +72,45 @@ and Container = {
     Positions   : rect []
 }
 
+and Frame = {
+    Title       : string
+    X           : single
+    Y           : single
+    Width       : single
+    Height      : single
+
+    HScroll     : single * single
+    VScroll     : single * single
+
+    Active      : int option
+    Hot         : int option
+
+    Layout      : Layout
+}
 
 and [<CustomComparison; CustomEquality>] Widget =
-    | Label     of Guid * Label
-    | Checkbox  of Guid * Label * bool
-    | Radiobox  of Guid * Label * (string * bool) []
-    | Button    of Guid * Label * bool
-    | HSlider   of Guid * Slider
-    | Collapse  of Guid * Label * CollapseState * Container
-    | Container of Guid * Container
-
+    | Label     of Wid * Label
+    | Checkbox  of Wid * Label * bool
+    | Radiobox  of Wid * Label * (string * bool) []
+    | Button    of Wid * Label * bool
+    | HSlider   of Wid * Slider
+    | Collapse  of Wid * Label * CollapseState * Container
+    | Container of Wid * Container
+    | Frame     of Wid * Frame
     with
         member x.Guid =
             match x with
-            | Label     (guid, _)       -> guid
-            | Checkbox  (guid, _, _)    -> guid
-            | Radiobox  (guid, _, _)    -> guid
-            | Button    (guid, _, _)    -> guid
-            | HSlider   (guid, _)       -> guid
-            | Collapse  (guid, _, _, _) -> guid
-            | Container (guid, _)       -> guid
+            | Label     (wid, _)       -> wid
+            | Checkbox  (wid, _, _)    -> wid
+            | Radiobox  (wid, _, _)    -> wid
+            | Button    (wid, _, _)    -> wid
+            | HSlider   (wid, _)       -> wid
+            | Collapse  (wid, _, _, _) -> wid
+            | Container (wid, _)       -> wid
+            | Frame     (wid, _)       -> wid
 
         interface IComparable<Widget> with
-            member this.CompareTo other = this.Guid.CompareTo other.Guid
+            member this.CompareTo other = (this.Guid |> int) - (other.Guid |> int)
           
         interface IComparable with
             member this.CompareTo other =
@@ -117,6 +136,7 @@ and WidgetType =
     | WtHSlider   
     | WtCollapse  
     | WtContainer
+    | WtFrame
 with
     override x.ToString () =
         match x with
@@ -127,12 +147,23 @@ with
         | WtHSlider  -> "hslider"  
         | WtCollapse -> "collapse" 
         | WtContainer-> "container" 
+        | WtFrame    -> "frame"
+        
+    static member from (wd: Widget) =
+        match wd with
+        | Label     _ -> WtLabel    
+        | Checkbox  _ -> WtCheckbox 
+        | Radiobox  _ -> WtRadiobox 
+        | Button    _ -> WtButton   
+        | HSlider   _ -> WtHSlider  
+        | Collapse  _ -> WtCollapse 
+        | Container _ -> WtContainer
+        | Frame     _ -> WtFrame    
 
 and Theme = {
     Name        : string
+    Atlas       : Atlas
     Widgets     : Map<WidgetType * PaintStyle, Base.WidgetData>
-    Present     : (rect * Widget)[] -> unit
-    ComputeSize : Widget -> size2
 }
 
 type PointerState = {
@@ -144,22 +175,6 @@ type PointerState = {
     member x.Left   = x.Button0
     member x.Middle = x.Button1
     member x.Right  = x.Button2
-
-type Frame = {
-    Title       : string
-    X           : single
-    Y           : single
-    Width       : single
-    Height      : single
-
-    HScroll     : single * single
-    VScroll     : single * single
-
-    Active      : int option
-    Hot         : int option
-
-    Layout      : Layout
-}
 
 type PaintStyle
 with
@@ -182,6 +197,7 @@ with
         | "hslider"   -> WtHSlider   
         | "collapse"  -> WtCollapse  
         | "container" -> WtContainer
+        | "frame"     -> WtContainer
         | _           -> failwith "unrecognized widget type"
 
   
@@ -190,5 +206,17 @@ let widgetTypeAndStyle (str: string) =
     match str.Split('.') with
     | [| wt; ws |] -> wt, ws |> PaintStyle.parse
     | _            -> failwith "invalid widget type and/or state"
+
+
+let private gWid = ref 0<WidM>
+let private newWid () =
+    let g = !gWid
+    gWid := !gWid + 1<WidM>
+    g
+
+type Widget
+with
+    static member label (fd: FontData) (s: string) = Label (newWid(), { Label.Caption = s; Font = fd })
+    static member button (fd: FontData) (s: string, pressed: bool) = Button (newWid(), { Label.Caption = s; Font = fd }, pressed)
 
 

@@ -62,10 +62,43 @@ module File =
         Widgets      : ((string * PaintStyle) * WidgetEntry)[]
     }
 
+type ICompositor =
+    abstract member TryGetFont      : string -> FontData option
+    abstract member TryGetWidget    : string -> WidgetData option
+    abstract member PresentAndReset : unit -> int
+    abstract member Post            : Command -> unit
+    abstract member Theme           : Theme
+
 //------------------------------------------------------------------------------
 
 type FontData
 with
+    member this.CharSize (ch : char) =
+        let chI = ch |> int
+        match this.CodePoints.TryFind chI with
+        | Some info -> size2 (info.Width |> single, info.Height |> single)
+        | _ -> size2()
+
+    member this.CharBox (ch : char) =
+        let chI = ch |> int
+        match this.CodePoints.TryFind chI with
+        | Some info -> size2 (info.AdvanceX |> single, info.AdvanceY |> single)
+        | _ -> size2()
+
+    /// compute string size, this is independent of the string alignment: alignment is a function of the max line width/height as such it doesn't matter
+    member this.StringSize (s: string) =
+        let c, w, h =
+            s
+            |> Seq.toArray
+            |> Array.fold (fun (cursor, width, height) ch ->
+                if ch = '\n'
+                then (0.0f, width, height + (this.Size + 2 |> single))  // TODO: 2 pixels ? this should be absolute value of the box
+                else
+                    let si = this.CharBox ch
+                    let cursor = cursor + si.width
+                    (cursor, max width cursor, height)) (0.0f, 0.0f, this.Size + 2 |> single)  // TODO: 2 pixels ? this should be absolute value of the box
+        size2(w, h)
+        
     static member from (f: File.FontEntry) = {
         Mode       = f.Mode
         Size       = f.Size
@@ -105,22 +138,70 @@ with
 
 type Theme
 with
-    static member contentSize (wid: Widget) : size2 =
+    member this.ContentSize (wid: Widget, ps: PaintStyle) : size2 =
         match wid with
-        | Label     _ -> failwith "not implemented"
+        | Label     (_, l) ->
+            l.Font.StringSize l.Caption
+
         | Checkbox  _ -> failwith "not implemented"
         | Radiobox  _ -> failwith "not implemented"
-        | Button    _ -> failwith "not implemented"
+        | Button    (_, l, b) -> 
+            let labelSize = l.Font.StringSize l.Caption
+            let v0, v1, h0, h1 =
+                match this.Widgets.TryFind (WtButton, ps) with
+                | Some wid -> wid.V0, wid.V1, wid.H0, wid.H1
+                | _ -> failwith (sprintf "widget style %O for button not found" ps)
+            size2(labelSize.width + (single (v0 + v1)) , labelSize.height + single(h0 + h1))
+
         | HSlider   _ -> failwith "not implemented"
         | Collapse  _ -> failwith "not implemented"
         | Container _ -> failwith "not implemented"
+        | Frame     _ -> failwith "not implemented"
+
+    member this.Draw (comp: ICompositor) (wid: Widget, ps: PaintStyle) (view: rect) =
+        match wid with
+        | Label     (_, l) ->
+            comp.Post (Command.PushRegion view)
+            comp.Post (Command.DrawString (l.Font, vec2(), l.Caption, color4(0.0f, 0.0f, 0.0f, 1.0f)))
+            comp.Post Command.PopRegion
+
+        | Button    (_, l, b) -> 
+            let labelSize = l.Font.StringSize l.Caption
+            let v0, v1, h0, h1 =
+                match this.Widgets.TryFind (WtButton, ps) with
+                | Some wid -> wid.V0, wid.V1, wid.H0, wid.H1
+                | _ -> failwith (sprintf "widget style %O for button not found" ps)
+            
+            let s = size2(labelSize.width + (single (v0 + v1)) , labelSize.height + single(h0 + h1))
+            
+            comp.Post (Command.PushRegion view)
+            match comp.Theme.Widgets.TryFind (WidgetType.from wid, ps) with
+            | Some wd ->
+                comp.Post (Command.DrawWidget (wd, vec2(), s))
+                comp.Post (Command.DrawString (l.Font, vec2(wd.H0 |> single, wd.V0 |> single), l.Caption, color4(0.0f, 0.0f, 0.0f, 1.0f)))
+            | _ -> failwith (sprintf "button style %O not found" ps)
+            comp.Post Command.PopRegion
+
+        | _ -> failwith "not implemented"
+       
 
     static member fromFile filename =
         use f = System.IO.File.OpenText filename
         let atlas = f.ReadToEnd ()
                     |> Data.JsonValue.Parse
                     |> Data.Json.deserialize<File.Atlas>
-        Atlas.from atlas
+        let atlas = Atlas.from atlas
+        let widSt =
+            atlas.Widgets
+            |> Map.toArray
+            |> Array.map(fun (s, widData) ->
+                let sArr = s.Split '.'
+                (sArr.[0] |> WidgetType.parse, sArr.[1] |> PaintStyle.parse), widData)
+            |> Map.ofArray
+
+        {   Name        = filename
+            Atlas       = atlas
+            Widgets     = widSt } : Theme
 
 type FrameManagerState = {
     ActiveFrame : int option
@@ -171,7 +252,7 @@ with
         | Some aw, Some hw ->
             if aw = wid then Active
             elif hw = wid then Hot
-            else Disabled
+            else Normal
         | _ -> Normal
 
 type Presenter = {

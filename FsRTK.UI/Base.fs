@@ -92,3 +92,13 @@ type Atlas = {
     Icons        : Map<string, IconData>
     Widgets      : Map<string, WidgetData>
 }
+
+type Command =
+    | PushRegion    of rect
+    | PopRegion
+    | DrawString    of FontData * vec2 * string * color4   
+    | FillRect      of vec2 * size2 * color4
+    | DrawLine      of single * vec2 * vec2 * color4
+    | DrawRect      of single * vec2 * size2 * color4
+    | DrawIcon      of IconData * vec2
+    | DrawWidget    of WidgetData * vec2 * size2
