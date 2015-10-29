@@ -48,23 +48,25 @@ type ButtonState =
     | Pressed
     | Released
 
-type Button = {
+type Button<'S> = {
     Caption : string
     State   : ButtonState
+    OnClick : ButtonState -> 'S
 }
 
 type CheckboxState =
     | Checked
     | Unchecked
 
-type Checkbox = {
+type Checkbox<'S> = {
     Caption : string
     State   : CheckboxState
+    OnCheck : CheckboxState -> 'S
 }
 
-type RadioGroup = {
+type RadioGroup<'S> = {
     Caption : string
-    Buttons : Checkbox []
+    Buttons : Checkbox<'S> []
 }
 
 type CollapsibleState =
@@ -73,58 +75,55 @@ type CollapsibleState =
 
 
 
-type HSlider = {
+type Slider<'S> = {
     Min : single
     Max : single
     Val : single
-}
-
-type VSlider = {
-    Min : single
-    Max : single
-    Val : single
+    OnChange    : single -> 'S
 }
 
 [<MeasureAttribute>] type wid
 
-type Layout = size2 * (Widget * size2) [] -> rect[]
+type Layout<'S> = size2 * (Widget<'S> * size2) [] -> rect[]
 
 
-and Container = {
-    Widgets     : Widget []
+and Container<'S> = {
+    Widgets     : Widget<'S> []
 
     Active      : int<wid> option
     Hot         : int<wid> option
     Disabled    : Set<int<wid>>
 
-    Layout      : Layout
+    Layout      : Layout<'S>
 
     Positions   : rect []
 }
 
-and Collapsible = {
-    Caption : string
-    State   : CollapsibleState
-    Container   : Container
+and Collapsible<'S> = {
+    Caption     : string
+    State       : CollapsibleState
+    Container   : Container<'S>
+    OnCollapse  : CollapsibleState -> 'S
 }
 
-and Frame = {
+and Frame<'S> = {
     Title       : string
     Position    : vec2
     Size        : size2
-    Container   : Container
+    Container   : Container<'S>
+    OnMove      : vec2 -> 'S
 }
 
-and Widget =
+and Widget<'S> =
     | Label         of Label
-    | Checkbox      of Checkbox
-    | RadioGroup    of RadioGroup
-    | Button        of Button
-    | HSlider       of HSlider
-    | VSlider       of VSlider
-    | Collapsible   of Collapsible
-    | Container     of Container
-    | Frame         of Frame
+    | Checkbox      of Checkbox<'S>
+    | RadioGroup    of RadioGroup<'S>
+    | Button        of Button<'S>
+    | HSlider       of Slider<'S>
+    | VSlider       of Slider<'S>
+    | Collapsible   of Collapsible<'S>
+    | Container     of Container<'S>
+    | Frame         of Frame<'S>
 
 
 and WidgetType =
@@ -150,7 +149,7 @@ with
         | WtContainer-> "container" 
         | WtFrame    -> "frame"
         
-    static member from (wd: Widget) =
+    static member from (wd: Widget<_>) =
         match wd with
         | Label     _ -> WtLabel    
         | Checkbox  _ -> WtCheckbox 
