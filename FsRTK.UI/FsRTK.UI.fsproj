@@ -48,6 +48,7 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Base.fs" />
     <Compile Include="Widgets.fs" />
+    <Compile Include="WidgetManager.fs" />
     <Compile Include="Theme.fs" />
     <Compile Include="Compositor.fs" />
     <Compile Include="Gles2Driver.fs" />

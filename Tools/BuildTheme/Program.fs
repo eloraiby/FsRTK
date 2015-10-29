@@ -41,7 +41,7 @@ type Arguments =
     | [<PrintLabels>] Remove_Icon   of icon  : string
     | [<PrintLabels>] Add_Widget    of widget: string * v0: int * v1: int * h0: int * h1: int
     | [<PrintLabels>] Remove_Widget of widget: string
-    | [<PrintLabels>] Add_Font      of font  : string * size: int * mode: string
+    | [<PrintLabels>] Add_Font      of font  : string * size: int * mode: string * alias: string
     | [<PrintLabels>] Remove_Font   of font  : string * size: int * mode: string
     | [<PrintLabels>] Build_To      of atlas : string * width: int * height: int
     | Draw_Bounds
@@ -88,7 +88,12 @@ let main argv =
 
         let widgetsToAdd    = addWidget                            |> Map.filter (fun k v -> not (widgetsToRemove.Contains k))
 
-        let fontsToAdd      = Set.difference addFont fontsToRemove
+        let fontsToAdd      =
+            addFont
+            |> Set.fold (fun s (f, si, m, a) ->
+                if fontsToRemove.Contains (a, si, m)
+                then s
+                else Set.add (f, si, m, a) s) Set.empty
 
         let themeFile = if (getExtension theme.[0]) = ".theme" then theme.[0] else theme.[0] + ".theme"
 
@@ -129,11 +134,11 @@ let main argv =
 
                 Fonts =
                     theme.Fonts
-                    |> Array.map (fun f -> f.FileName, f.Size, toString f.Mode)
+                    |> Array.map (fun f -> f.FileName, f.Size, toString f.Mode, f.Alias)
                     |> Set.ofArray
                     |> Set.union fontsToAdd
                     |> Set.toArray
-                    |> Array.map (fun (f, s, m) -> { Source.FontEntry.FileName = f; Size = s; Mode = FontRenderMode.parse m })
+                    |> Array.map (fun (f, s, m, a) -> { Source.FontEntry.FileName = f; Size = s; Mode = FontRenderMode.parse m; Alias = a })
 
                 Widgets =
                     theme.Widgets

@@ -68,6 +68,10 @@ type ICompositor =
     abstract member PresentAndReset : unit -> int
     abstract member Post            : Command -> unit
     abstract member Theme           : Theme
+    abstract member ContentFont     : FontData
+    abstract member TitleFont       : FontData
+    abstract member IconFont        : FontData
+    abstract member MonoFont        : FontData
 
 //------------------------------------------------------------------------------
 
@@ -138,15 +142,15 @@ with
 
 type Theme
 with
-    member this.ContentSize (wid: Widget, ps: PaintStyle) : size2 =
+    member this.ContentSize (comp: ICompositor) (wid: Widget, ps: PaintStyle) : size2 =
         match wid with
-        | Label     (_, l) ->
-            l.Font.StringSize l.Caption
+        | Label     l -> comp.ContentFont.StringSize l.Caption
 
         | Checkbox  _ -> failwith "not implemented"
-        | Radiobox  _ -> failwith "not implemented"
-        | Button    (_, l, b) -> 
-            let labelSize = l.Font.StringSize l.Caption
+        | RadioGroup  _ -> failwith "not implemented"
+        | Button    b ->
+            let labelSize = comp.ContentFont.StringSize b.Caption
+
             let v0, v1, h0, h1 =
                 match this.Widgets.TryFind (WtButton, ps) with
                 | Some wid -> wid.V0, wid.V1, wid.H0, wid.H1
@@ -154,19 +158,29 @@ with
             size2(labelSize.width + (single (v0 + v1)) , labelSize.height + single(h0 + h1))
 
         | HSlider   _ -> failwith "not implemented"
-        | Collapse  _ -> failwith "not implemented"
+        | VSlider   _ -> failwith "not implemented"
+        | Collapsible  _ -> failwith "not implemented"
         | Container _ -> failwith "not implemented"
         | Frame     _ -> failwith "not implemented"
 
-    member this.Draw (comp: ICompositor) (wid: Widget, ps: PaintStyle) (view: rect) =
+    member this.Draw (comp: ICompositor) (isDisabled: bool) (isHot: bool) (wid: Widget) (view: rect) =
         match wid with
-        | Label     (_, l) ->
+        | Label     l ->
             comp.Post (Command.PushRegion view)
-            comp.Post (Command.DrawString (l.Font, vec2(), l.Caption, color4(0.0f, 0.0f, 0.0f, 1.0f)))
+            comp.Post (Command.DrawString (comp.ContentFont, vec2(), l.Caption, color4(0.0f, 0.0f, 0.0f, 1.0f)))
             comp.Post Command.PopRegion
 
-        | Button    (_, l, b) -> 
-            let labelSize = l.Font.StringSize l.Caption
+        | Button    b -> 
+            let ps =
+                if isDisabled
+                then PaintStyle.Disabled
+                elif isHot
+                then PaintStyle.Hot
+                else match b.State with
+                     | Pressed -> PaintStyle.Active
+                     | Released -> PaintStyle.Normal
+
+            let labelSize = comp.ContentFont.StringSize b.Caption
             let v0, v1, h0, h1 =
                 match this.Widgets.TryFind (WtButton, ps) with
                 | Some wid -> wid.V0, wid.V1, wid.H0, wid.H1
@@ -178,11 +192,18 @@ with
             match comp.Theme.Widgets.TryFind (WidgetType.from wid, ps) with
             | Some wd ->
                 comp.Post (Command.DrawWidget (wd, vec2(), s))
-                comp.Post (Command.DrawString (l.Font, vec2(wd.H0 |> single, wd.V0 |> single), l.Caption, color4(0.0f, 0.0f, 0.0f, 1.0f)))
+                comp.Post (Command.DrawString (comp.ContentFont, vec2(wd.H0 |> single, wd.V0 |> single), b.Caption, color4(0.0f, 0.0f, 0.0f, 1.0f)))
             | _ -> failwith (sprintf "button style %O not found" ps)
             comp.Post Command.PopRegion
 
-        | _ -> failwith "not implemented"
+        | Checkbox  _ -> failwith "not implemented"
+        | RadioGroup  _ -> failwith "not implemented"
+        | HSlider   _ -> failwith "not implemented"
+        | VSlider   _ -> failwith "not implemented"
+        | Collapsible  _ -> failwith "not implemented"
+        | Container _ -> failwith "not implemented"
+        | Frame     _ -> failwith "not implemented"
+
        
 
     static member fromFile filename =
@@ -212,19 +233,6 @@ type FrameManagerState = {
     Frames      : Frame[]
 }
 
-type PointerEvent =
-    | MoveTo    of vec2
-    | ClickAt   of vec2
-    | ReleaseAt of vec2
-    | DragTo    of vec2
-    | Scroll    of single
-with
-    static member extractPointerEvent (prev: PointerState, curr: PointerState) =
-        match prev, curr with
-        | { Position = p; Button0 = true  }, { Position = c; Button0 = true  } when p <> c -> DragTo    c
-        | { Position = p; Button0 = false }, { Position = c; Button0 = true  }             -> ClickAt   c
-        | { Position = p; Button0 = true  }, { Position = c; Button0 = false }             -> ReleaseAt c
-        | _                                , { Position = c                  }             -> MoveTo    c
 
 type FrameManagerState
 with
@@ -240,20 +248,6 @@ with
 
     static member nextHot    = FrameManagerState.getContainingBoxIndex
     static member nextActive = FrameManagerState.getContainingBoxIndex
-
-type private RenderState =
-    | Hot
-    | Active
-    | Normal
-    | Disabled
-with
-    static member mapControlState (cont: Container) (wid: Widget) =
-        match cont.ActiveWidget, cont.HotWidget with
-        | Some aw, Some hw ->
-            if aw = wid then Active
-            elif hw = wid then Hot
-            else Normal
-        | _ -> Normal
 
 type Presenter = {
     DrawTile           : int * vec2 -> unit

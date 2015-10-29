@@ -176,6 +176,11 @@ type private CompositorImpl(theme: Theme, driver: IDriver) =
     let atlas   = theme.Atlas
     let uiImage = atlas.ImageName
     let white   = atlas.Icons.["white"]
+
+    let titleFont   = atlas.Fonts.["title"]
+    let contentFont = atlas.Fonts.["content"]
+    let iconFont    = atlas.Fonts.["icon"]
+    let monoFont    = atlas.Fonts.["mono"]
     
     do driver.SetAtlasImage uiImage
 
@@ -531,6 +536,11 @@ type private CompositorImpl(theme: Theme, driver: IDriver) =
 
         member x.Post cmd = queue.Enqueue cmd
         member x.Theme = theme
+        
+        member x.ContentFont = contentFont
+        member x.IconFont    = iconFont
+        member x.TitleFont   = titleFont
+        member x.MonoFont    = monoFont
 
 let create (theme: Theme, driver: IDriver) = CompositorImpl (theme, driver) :> ICompositor
 

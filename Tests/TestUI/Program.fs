@@ -48,8 +48,9 @@ let main argv =
     let buttonNormal = uiCompositor.TryGetWidget "button.normal"
     let buttonDisabled = uiCompositor.TryGetWidget "button.disabled"
 
-    let label0 = match droid12 with Some fd -> Widget.label fd "Hello From Label" | _ -> failwith "font not found"
-    let button0 = match droid12 with Some fd -> Widget.button fd ("Hello From Button\nHello again" , false) | _ -> failwith "font not found"
+    let label0 = Widget.Label fd "Hello From Label"
+    let button0_released =  Widget.button fd ("Hello From Button\nHello again" , Released)
+    let button0_pressed  =  Widget.button fd ("Hello From Button\nHello again" , Pressed )
 
     while Glfw3.windowShouldClose window |> not do
 
@@ -58,6 +59,7 @@ let main argv =
 
         let width, height = Glfw3.getWindowSize window
         let mx, my = Glfw3.getCursorPos window
+        let action = Glfw3.getMouseButton (window, MouseButton.BUTTON_LEFT)
         glViewport (0, 0, width, height)
         //uiCompositor.Post (Ui.Compositor.Command.FillRect (vec2(0.0f, 0.0f), size2(width |> single, height |> single), color4(0.0f, 1.0f, 0.0f, 1.0f)))
         uiCompositor.Post (PushRegion (rect (0.0f, 0.0f, width |> single, height |> single)))
@@ -69,8 +71,12 @@ let main argv =
         | Some frame ->
             uiCompositor.Post (Command.PushRegion (rect (vec2(mx |> single, my |> single), size2(250.0f, 250.0f))))
             uiCompositor.Post (Command.DrawWidget (frame, vec2(0.0f, 0.0f), size2(250.0f, 250.0f)))
-            theme.Draw uiCompositor (label0, PaintStyle.Normal) (rect (0.0f, 0.0f, 100.0f, 100.0f))
-            theme.Draw uiCompositor (button0, PaintStyle.Normal) (rect (16.0f, 16.0f, 200.0f, 200.0f))
+            theme.Draw uiCompositor false false label0 (rect (0.0f, 0.0f, 100.0f, 100.0f))
+            
+            match action with
+            | Action.PRESS | Action.REPEAT -> theme.Draw uiCompositor false false button0_pressed (rect (16.0f, 16.0f, 200.0f, 200.0f))
+            | Action.RELEASE -> theme.Draw uiCompositor false false button0_released (rect (16.0f, 16.0f, 200.0f, 200.0f))
+
             uiCompositor.Post Command.PopRegion
         | _ -> ()
 

@@ -28,6 +28,7 @@ module Source =
         FileName    : string
         Size        : int
         Mode        : FontRenderMode
+        Alias       : string
     }
 
     type IconEntry  = {
@@ -212,7 +213,7 @@ let buildAtlas (ftLib: SharpFont.Library) (themeName: string) (size: isize2) (ro
                 let fontName    = getPath f.FileName
                 use face = ftLib.NewFace (fontName, 0)
                 let cpMap   = compileFont ftLib face f.Mode f.Size g ropt slAtlas cps
-                (sprintf "%s-%O-%O" (stripDirectoryAndExtension f.FileName) f.Mode f.Size)
+                (sprintf "%s" f.Alias)
                 , { File.FontEntry.Mode       = f.Mode
                     File.FontEntry.Size       = f.Size
                     File.FontEntry.CodePoints = cpMap })

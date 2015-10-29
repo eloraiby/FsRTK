@@ -30,7 +30,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DocumentationFile>bin\Debug\BuildTheme.XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
-    <StartArguments>--theme test --build-to test 512 512 --add-font Fonts/DroidSans.ttf 12 antialias --add-font Fonts/DroidSans-Bold.ttf 12 antialias --add-icon Icons/white.png --add-widget Widgets/frame.active.png 4 4 24 4 --add-widget Widgets/button.normal.png 4 4 4 4 --add-widget Widgets/button.hot.png 4 4 4 4  --add-widget Widgets/button.disabled.png 4 4 4 4  --add-widget Widgets/button.active.png 4 4 4 4</StartArguments>
+    <StartArguments>--theme test --build-to test 512 512 --add-font Fonts/DroidSans.ttf 10 antialias content --add-font Fonts/DroidSans-Bold.ttf 10 antialias title --add-font Fonts/DroidSansMono.ttf 10 antialias mono --add-font Fonts/DroidSans.ttf 8 antialias icon --add-icon Icons/white.png --add-widget Widgets/frame.active.png 4 4 24 4 --add-widget Widgets/button.normal.png 4 4 4 4 --add-widget Widgets/button.hot.png 4 4 4 4  --add-widget Widgets/button.disabled.png 4 4 4 4  --add-widget Widgets/button.active.png 4 4 4 4</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -78,11 +78,12 @@
     <Content Include="Fonts\DroidSans-Bold.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-
+    <None Include="Fonts\DroidSansMono.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Content Include="Icons\white.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    
     <Content Include="Widgets\frame.active.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

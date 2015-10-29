@@ -27,12 +27,6 @@ open FsRTK.Math3D.Geometry
 
 open FsRTK.Ui.Base
 
-type Slider = {
-    Min : single
-    Max : single
-    Val : single
-}
-
 type PaintStyle =
     | Hot
     | Active
@@ -47,94 +41,100 @@ with
         | Disabled  -> "disabled"
 
 type Label = {
-    Font    : FontData
     Caption : string
 }
 
-type CollapseState =
+type ButtonState =
+    | Pressed
+    | Released
+
+type Button = {
+    Caption : string
+    State   : ButtonState
+}
+
+type CheckboxState =
+    | Checked
+    | Unchecked
+
+type Checkbox = {
+    Caption : string
+    State   : CheckboxState
+}
+
+type RadioGroup = {
+    Caption : string
+    Buttons : Checkbox []
+}
+
+type CollapsibleState =
     | Collapsed
     | Expanded
 
-[<MeasureAttribute>] type WidM
-type Wid = int<WidM>
+
+
+type HSlider = {
+    Min : single
+    Max : single
+    Val : single
+}
+
+type VSlider = {
+    Min : single
+    Max : single
+    Val : single
+}
+
+[<MeasureAttribute>] type wid
 
 type Layout = size2 * (Widget * size2) [] -> rect[]
+
 
 and Container = {
     Widgets     : Widget []
 
-    ActiveWidget: Widget option
-    HotWidget   : Widget option
-    Deactivated : Widget []
+    Active      : int<wid> option
+    Hot         : int<wid> option
+    Disabled    : Set<int<wid>>
 
     Layout      : Layout
 
     Positions   : rect []
 }
 
-and Frame = {
-    Title       : string
-    X           : single
-    Y           : single
-    Width       : single
-    Height      : single
-
-    HScroll     : single * single
-    VScroll     : single * single
-
-    Active      : int option
-    Hot         : int option
-
-    Layout      : Layout
+and Collapsible = {
+    Caption : string
+    State   : CollapsibleState
+    Container   : Container
 }
 
-and [<CustomComparison; CustomEquality>] Widget =
-    | Label     of Wid * Label
-    | Checkbox  of Wid * Label * bool
-    | Radiobox  of Wid * Label * (string * bool) []
-    | Button    of Wid * Label * bool
-    | HSlider   of Wid * Slider
-    | Collapse  of Wid * Label * CollapseState * Container
-    | Container of Wid * Container
-    | Frame     of Wid * Frame
-    with
-        member x.Guid =
-            match x with
-            | Label     (wid, _)       -> wid
-            | Checkbox  (wid, _, _)    -> wid
-            | Radiobox  (wid, _, _)    -> wid
-            | Button    (wid, _, _)    -> wid
-            | HSlider   (wid, _)       -> wid
-            | Collapse  (wid, _, _, _) -> wid
-            | Container (wid, _)       -> wid
-            | Frame     (wid, _)       -> wid
+and Frame = {
+    Title       : string
+    Position    : vec2
+    Size        : size2
+    Container   : Container
+}
 
-        interface IComparable<Widget> with
-            member this.CompareTo other = (this.Guid |> int) - (other.Guid |> int)
-          
-        interface IComparable with
-            member this.CompareTo other =
-                match other with
-                | :? Widget as other -> (this :> IComparable<Widget>).CompareTo other
-                | _ -> failwith "other is not a Widget"
+and Widget =
+    | Label         of Label
+    | Checkbox      of Checkbox
+    | RadioGroup    of RadioGroup
+    | Button        of Button
+    | HSlider       of HSlider
+    | VSlider       of VSlider
+    | Collapsible   of Collapsible
+    | Container     of Container
+    | Frame         of Frame
 
-        interface IEquatable<Widget> with
-            member this.Equals other = this.Guid.Equals other.Guid
-
-        override this.Equals obj =
-            match obj with
-            | :? Widget as other -> (this :> IEquatable<Widget>).Equals other
-            | _ -> failwith "obj is not a Widget"
-
-        override this.GetHashCode () = this.Guid.GetHashCode ()
 
 and WidgetType =
     | WtLabel      
     | WtCheckbox  
-    | WtRadiobox  
+    | WtRadioGroup 
     | WtButton    
     | WtHSlider   
-    | WtCollapse  
+    | WtVSlider   
+    | WtCollapsible
     | WtContainer
     | WtFrame
 with
@@ -142,10 +142,11 @@ with
         match x with
         | WtLabel    -> "label"    
         | WtCheckbox -> "checkbox" 
-        | WtRadiobox -> "radiobox" 
+        | WtRadioGroup -> "radiogroup" 
         | WtButton   -> "button"   
         | WtHSlider  -> "hslider"  
-        | WtCollapse -> "collapse" 
+        | WtVSlider  -> "vslider"  
+        | WtCollapsible -> "collapsible" 
         | WtContainer-> "container" 
         | WtFrame    -> "frame"
         
@@ -153,10 +154,11 @@ with
         match wd with
         | Label     _ -> WtLabel    
         | Checkbox  _ -> WtCheckbox 
-        | Radiobox  _ -> WtRadiobox 
+        | RadioGroup  _ -> WtRadioGroup 
         | Button    _ -> WtButton   
         | HSlider   _ -> WtHSlider  
-        | Collapse  _ -> WtCollapse 
+        | VSlider   _ -> WtVSlider  
+        | Collapsible  _ -> WtCollapsible 
         | Container _ -> WtContainer
         | Frame     _ -> WtFrame    
 
@@ -168,9 +170,9 @@ and Theme = {
 
 type PointerState = {
     Position    : vec2
-    Button0     : bool
-    Button1     : bool
-    Button2     : bool
+    Button0     : ButtonState
+    Button1     : ButtonState
+    Button2     : ButtonState
 } with
     member x.Left   = x.Button0
     member x.Middle = x.Button1
@@ -192,10 +194,11 @@ with
         match str with
         | "label"     -> WtLabel      
         | "checkbox"  -> WtCheckbox  
-        | "radiobox"  -> WtRadiobox  
+        | "radiogroup"-> WtRadioGroup
         | "button"    -> WtButton    
         | "hslider"   -> WtHSlider   
-        | "collapse"  -> WtCollapse  
+        | "vslider"   -> WtVSlider   
+        | "collapsible" -> WtCollapsible
         | "container" -> WtContainer
         | "frame"     -> WtContainer
         | _           -> failwith "unrecognized widget type"
@@ -208,15 +211,17 @@ let widgetTypeAndStyle (str: string) =
     | _            -> failwith "invalid widget type and/or state"
 
 
-let private gWid = ref 0<WidM>
-let private newWid () =
-    let g = !gWid
-    gWid := !gWid + 1<WidM>
-    g
-
-type Widget
-with
-    static member label (fd: FontData) (s: string) = Label (newWid(), { Label.Caption = s; Font = fd })
-    static member button (fd: FontData) (s: string, pressed: bool) = Button (newWid(), { Label.Caption = s; Font = fd }, pressed)
+//let private gWid = ref 0<WidM>
+//let private newWid () =
+//    let g = !gWid
+//    gWid := !gWid + 1<WidM>
+//    g
+//
+//type Widget
+//with
+//    static member label (fd: FontData) (s: string) = Label (newWid(), { Label.Caption = s; Font = fd })
+//    static member button (fd: FontData) (s: string, bs: ButtonState) = Button (newWid(), { Label.Caption = s; Font = fd }, bs)
+//
+//
 
 
