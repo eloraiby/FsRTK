@@ -142,7 +142,7 @@ with
 
 type Theme
 with
-    member this.ContentSize (comp: ICompositor) (wid: Widget, ps: PaintStyle) : size2 =
+    member this.ContentSize (comp: ICompositor) (wid: Widget<'S>, ps: PaintStyle) : size2 =
         match wid with
         | Label     l -> comp.ContentFont.StringSize l.Caption
 
@@ -163,7 +163,7 @@ with
         | Container _ -> failwith "not implemented"
         | Frame     _ -> failwith "not implemented"
 
-    member this.Draw (comp: ICompositor) (isDisabled: bool) (isHot: bool) (wid: Widget) (view: rect) =
+    member this.Draw<'S> (comp: ICompositor) (isDisabled: bool) (isHot: bool) (wid: Widget<'S>) (view: rect) =
         match wid with
         | Label     l ->
             comp.Post (Command.PushRegion view)
@@ -224,17 +224,17 @@ with
             Atlas       = atlas
             Widgets     = widSt } : Theme
 
-type FrameManagerState = {
+type FrameManagerState<'S> = {
     ActiveFrame : int option
     HotFrame    : int option
 
     PrevPointerState  : PointerState option
 
-    Frames      : Frame[]
+    Frames      : Frame<'S>[]
 }
 
 
-type FrameManagerState
+type FrameManagerState<'S>
 with
     static member getContainingBoxIndex (pos: vec2, rects: rect[]) : int option =
         let rec findFirst i =
@@ -246,8 +246,8 @@ with
             else None
         findFirst 0
 
-    static member nextHot    = FrameManagerState.getContainingBoxIndex
-    static member nextActive = FrameManagerState.getContainingBoxIndex
+    static member nextHot    = FrameManagerState<'S>.getContainingBoxIndex
+    static member nextActive = FrameManagerState<'S>.getContainingBoxIndex
 
 type Presenter = {
     DrawTile           : int * vec2 -> unit

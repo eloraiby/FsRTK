@@ -29,6 +29,11 @@ open FsRTK.Ui.Base
 open FsRTK.Ui.Widgets
 open FsRTK.Ui.Theme
 
+type Signal =
+    | ButtonOkPressed
+
+type Widget = Widget<Signal>
+
 [<EntryPoint>]
 let main argv =
     let init = Glfw3.init ()
@@ -40,7 +45,7 @@ let main argv =
     let theme = Theme.fromFile "test.atlas"
     let uiDriver = new Ui.Gles2Driver.OpenGLDriver (65535, 8096) :> Ui.Compositor.IDriver
     let uiCompositor = Ui.Compositor.create (theme, uiDriver)
-    let droid12 = uiCompositor.TryGetFont "DroidSans-antialias-12"
+    let droid12 = uiCompositor.TryGetFont "content"
 
     let frame = uiCompositor.TryGetWidget "frame.active" 
     let buttonActive = uiCompositor.TryGetWidget "button.active"
@@ -48,9 +53,9 @@ let main argv =
     let buttonNormal = uiCompositor.TryGetWidget "button.normal"
     let buttonDisabled = uiCompositor.TryGetWidget "button.disabled"
 
-    let label0 = Widget.Label fd "Hello From Label"
-    let button0_released =  Widget.button fd ("Hello From Button\nHello again" , Released)
-    let button0_pressed  =  Widget.button fd ("Hello From Button\nHello again" , Pressed )
+    let label0 = Widget.label "Hello From Label"
+    let button0_released =  Widget.button ("Hello From Button\nHello again" , Released) (fun s -> ButtonOkPressed)
+    let button0_pressed  =  Widget.button ("Hello From Button\nHello again" , Pressed ) (fun s -> ButtonOkPressed)
 
     while Glfw3.windowShouldClose window |> not do
 

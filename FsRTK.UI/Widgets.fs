@@ -51,7 +51,7 @@ type ButtonState =
 type Button<'S> = {
     Caption : string
     State   : ButtonState
-    OnClick : ButtonState -> 'S
+    OnStateChange : ButtonState -> 'S
 }
 
 type CheckboxState =
@@ -61,7 +61,7 @@ type CheckboxState =
 type Checkbox<'S> = {
     Caption : string
     State   : CheckboxState
-    OnCheck : CheckboxState -> 'S
+    OnStateChange : CheckboxState -> 'S
 }
 
 type RadioGroup<'S> = {
@@ -79,7 +79,7 @@ type Slider<'S> = {
     Min : single
     Max : single
     Val : single
-    OnChange    : single -> 'S
+    OnStateChange : single -> 'S
 }
 
 [<MeasureAttribute>] type wid
@@ -103,7 +103,7 @@ and Collapsible<'S> = {
     Caption     : string
     State       : CollapsibleState
     Container   : Container<'S>
-    OnCollapse  : CollapsibleState -> 'S
+    OnStateChange : CollapsibleState -> 'S
 }
 
 and Frame<'S> = {
@@ -111,7 +111,7 @@ and Frame<'S> = {
     Position    : vec2
     Size        : size2
     Container   : Container<'S>
-    OnMove      : vec2 -> 'S
+    OnStateChange : vec2 -> 'S
 }
 
 and Widget<'S> =
@@ -216,11 +216,17 @@ let widgetTypeAndStyle (str: string) =
 //    gWid := !gWid + 1<WidM>
 //    g
 //
-//type Widget
-//with
-//    static member label (fd: FontData) (s: string) = Label (newWid(), { Label.Caption = s; Font = fd })
-//    static member button (fd: FontData) (s: string, bs: ButtonState) = Button (newWid(), { Label.Caption = s; Font = fd }, bs)
-//
-//
+type Widget<'S>
+with
+    static member label  (s: string) =
+        Label { Label.Caption = s }
+
+    static member button (s: string, bs: ButtonState) (f: ButtonState -> 'S) =
+        Button { Button.Caption     = s
+                 State              = bs
+                 OnStateChange      = f }
+
+
+
 
 
