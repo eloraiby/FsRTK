@@ -210,12 +210,6 @@ let widgetTypeAndStyle (str: string) =
     | _            -> failwith "invalid widget type and/or state"
 
 
-//let private gWid = ref 0<WidM>
-//let private newWid () =
-//    let g = !gWid
-//    gWid := !gWid + 1<WidM>
-//    g
-//
 type Widget<'S>
 with
     static member label  (s: string) =

@@ -22,3 +22,6 @@ with
         | { Position = p; Button0 = Pressed  }, { Position = c; Button0 = Released }             -> ReleaseAt c
         | _                                   , { Position = c                     }             -> MoveTo    c
 
+
+type Event =
+    | PointerEvent  of PointerEvent
