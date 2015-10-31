@@ -5,6 +5,8 @@ open FsRTK.Math3D.Vector
 open FsRTK.Math3D.Matrix
 open FsRTK.Math3D.Geometry
 
+open FsRTK.Data
+
 open FsRTK.Ui.Base
 open FsRTK.Ui.Widgets
 
@@ -23,5 +25,14 @@ with
         | _                                   , { Position = c                     }             -> MoveTo    c
 
 
-type Event =
-    | PointerEvent  of PointerEvent
+type WindowEvent =
+    | CursorMove    of vec2
+    | CursorPress   of int * vec2
+    | CursorRelease of int * vec2
+
+type Manager = {
+    Queue   : Queue<WindowEvent>
+    
+}
+    
+    

@@ -104,6 +104,7 @@ let main argv =
         uiCompositor.Post Command.PopRegion
         uiCompositor.PresentAndReset () |> ignore
 
+        
         Glfw3.swapBuffers window
         //Glfw3.pollEvents ()
         Glfw3.waitEvents ()

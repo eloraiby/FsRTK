@@ -52,10 +52,11 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="Queue.fs" />
     <Compile Include="TextConversions.fs" />
     <Compile Include="TextRuntime.fs" />
     <Compile Include="JsonValue.fs" />
-    <Compile Include="Reflection.fs" />
+    <Compile Include="JsonSerialize.fs" />
     <Content Include="Apache License.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
