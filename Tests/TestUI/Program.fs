@@ -81,6 +81,7 @@ let main argv =
             match action with
             | Action.PRESS | Action.REPEAT -> theme.Draw uiCompositor false false button0_pressed (rect (16.0f, 16.0f, 200.0f, 200.0f))
             | Action.RELEASE -> theme.Draw uiCompositor false false button0_released (rect (16.0f, 16.0f, 200.0f, 200.0f))
+            | _ -> failwith "impossible"
 
             uiCompositor.Post Command.PopRegion
         | _ -> ()

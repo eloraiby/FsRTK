@@ -31,8 +31,13 @@ type WindowEvent =
     | CursorRelease of int * vec2
 
 type Manager = {
-    Queue   : Queue<WindowEvent>
-    
-}
+    EventQueue  : Queue<WindowEvent>
+} with
+    member x.EnqueueEvent e = { x with EventQueue = x.EventQueue.Enqueue e }
+
+    static member applyOneEvent (m: Manager) =
+        let e, newEvQueue = m.EventQueue.Dequeue ()
+
+        { m with EventQueue = newEvQueue }
     
     
