@@ -62,16 +62,7 @@ module File =
         Widgets      : ((string * PaintStyle) * WidgetEntry)[]
     }
 
-type ICompositor =
-    abstract member TryGetFont      : string -> FontData option
-    abstract member TryGetWidget    : string -> WidgetData option
-    abstract member PresentAndReset : unit -> int
-    abstract member Post            : Command -> unit
-    abstract member Theme           : Theme
-    abstract member ContentFont     : FontData
-    abstract member TitleFont       : FontData
-    abstract member IconFont        : FontData
-    abstract member MonoFont        : FontData
+
 
 //------------------------------------------------------------------------------
 

@@ -93,6 +93,24 @@ type Atlas = {
     Widgets      : Map<string, WidgetData>
 }
 
+type WindowEvent =
+    | CursorMove    of vec2
+    | CursorPress   of int * vec2
+    | CursorRelease of int * vec2
+
+type PaintStyle =
+    | Hot
+    | Active
+    | Normal
+    | Disabled
+with
+    override x.ToString () =
+        match x with
+        | Hot       -> "hot"       
+        | Active    -> "active"    
+        | Normal    -> "normal"    
+        | Disabled  -> "disabled"
+
 type Command =
     | PushRegion    of rect
     | PopRegion
@@ -102,3 +120,66 @@ type Command =
     | DrawRect      of single * vec2 * size2 * color4
     | DrawIcon      of IconData * vec2
     | DrawWidget    of WidgetData * vec2 * size2
+
+type ICompositor =
+    abstract member TryGetFont      : string -> FontData option
+    abstract member TryGetWidget    : string -> WidgetData option
+    abstract member PresentAndReset : unit -> int
+    abstract member Post            : Command -> unit
+    abstract member Theme           : Theme
+    abstract member ContentFont     : FontData
+    abstract member TitleFont       : FontData
+    abstract member IconFont        : FontData
+    abstract member MonoFont        : FontData
+
+and WidgetType =
+    | WtLabel      
+    | WtCheckbox  
+    | WtRadioGroup 
+    | WtButton    
+    | WtHSlider   
+    | WtVSlider   
+    | WtCollapsible
+    | WtContainer
+    | WtFrame
+with
+    override x.ToString () =
+        match x with
+        | WtLabel    -> "label"    
+        | WtCheckbox -> "checkbox" 
+        | WtRadioGroup -> "radiogroup" 
+        | WtButton   -> "button"   
+        | WtHSlider  -> "hslider"  
+        | WtVSlider  -> "vslider"  
+        | WtCollapsible -> "collapsible" 
+        | WtContainer-> "container" 
+        | WtFrame    -> "frame"
+
+and Theme = {
+    Name        : string
+    Atlas       : Atlas
+    Widgets     : Map<WidgetType * PaintStyle, WidgetData>
+}
+
+//type WidgetBase = {
+//    State   : obj
+//    Region  : rect
+//    Paint   : ICompositor -> Theme -> size2 -> obj -> unit
+//    Handle  : WindowEvent -> obj -> obj
+//}
+//
+//type IWidget =
+//    abstract State  : obj
+//    abstract member Paint  : ICompositor -> Theme -> size2 -> obj -> unit
+//    abstract member HandlePointerEvent : WindowEvent -> obj -> obj
+//
+//type Widget<'S> = {
+//     State   : 'S
+//     Paint   : ICompositor -> Theme -> size2 -> 'S -> unit
+//     HandlePointerEvent : WindowEvent -> 'S -> 'S
+//} with
+//    interface IWidget with
+//        member x.State  = box x.State
+//        member x.Paint c t s o = x.Paint c t s (unbox<'S> o)
+//        member x.HandlePointerEvent w o = x.HandlePointerEvent w (unbox<'S> o) |> box
+

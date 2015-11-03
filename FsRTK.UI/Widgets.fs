@@ -27,18 +27,8 @@ open FsRTK.Math3D.Geometry
 
 open FsRTK.Ui.Base
 
-type PaintStyle =
-    | Hot
-    | Active
-    | Normal
-    | Disabled
-with
-    override x.ToString () =
-        match x with
-        | Hot       -> "hot"       
-        | Active    -> "active"    
-        | Normal    -> "normal"    
-        | Disabled  -> "disabled"
+
+
 
 type Label = {
     Caption : string
@@ -126,28 +116,8 @@ and Widget<'S> =
     | Frame         of Frame<'S>
 
 
-and WidgetType =
-    | WtLabel      
-    | WtCheckbox  
-    | WtRadioGroup 
-    | WtButton    
-    | WtHSlider   
-    | WtVSlider   
-    | WtCollapsible
-    | WtContainer
-    | WtFrame
+type WidgetType
 with
-    override x.ToString () =
-        match x with
-        | WtLabel    -> "label"    
-        | WtCheckbox -> "checkbox" 
-        | WtRadioGroup -> "radiogroup" 
-        | WtButton   -> "button"   
-        | WtHSlider  -> "hslider"  
-        | WtVSlider  -> "vslider"  
-        | WtCollapsible -> "collapsible" 
-        | WtContainer-> "container" 
-        | WtFrame    -> "frame"
         
     static member from (wd: Widget<_>) =
         match wd with
@@ -160,12 +130,6 @@ with
         | Collapsible  _ -> WtCollapsible 
         | Container _ -> WtContainer
         | Frame     _ -> WtFrame    
-
-and Theme = {
-    Name        : string
-    Atlas       : Atlas
-    Widgets     : Map<WidgetType * PaintStyle, Base.WidgetData>
-}
 
 type PointerState = {
     Position    : vec2
@@ -210,6 +174,20 @@ let widgetTypeAndStyle (str: string) =
     | _            -> failwith "invalid widget type and/or state"
 
 
+type PointerEvent =
+    | MoveTo    of vec2
+    | ClickAt   of vec2
+    | ReleaseAt of vec2
+    | DragTo    of vec2
+    | Scroll    of single
+with
+    static member extractPointerEvent (prev: PointerState, curr: PointerState) =
+        match prev, curr with
+        | { Position = p; Button0 = Pressed  }, { Position = c; Button0 = Pressed  } when p <> c -> DragTo    c
+        | { Position = p; Button0 = Released }, { Position = c; Button0 = Pressed  }             -> ClickAt   c
+        | { Position = p; Button0 = Pressed  }, { Position = c; Button0 = Released }             -> ReleaseAt c
+        | _                                   , { Position = c                     }             -> MoveTo    c
+
 type Widget<'S>
 with
     static member label  (s: string) =
@@ -219,6 +197,11 @@ with
         Button { Button.Caption     = s
                  State              = bs
                  OnStateChange      = f }
+
+
+    static member handlePointerEvent (e: PointerEvent) (w: Widget<'S>) =
+
+        failwith "unimplemented"
 
 
 

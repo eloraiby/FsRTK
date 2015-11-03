@@ -10,32 +10,30 @@ open FsRTK.Data
 open FsRTK.Ui.Base
 open FsRTK.Ui.Widgets
 
-type PointerEvent =
-    | MoveTo    of vec2
-    | ClickAt   of vec2
-    | ReleaseAt of vec2
-    | DragTo    of vec2
-    | Scroll    of single
+//    Widgets     : Widget<'S> []
+//
+//    Active      : int<wid> option
+//    Hot         : int<wid> option
+//    Disabled    : Set<int<wid>>
+//
+//    Layout      : Layout<'S>
+//
+//    Positions   : rect []
+type Container<'S>
 with
-    static member extractPointerEvent (prev: PointerState, curr: PointerState) =
-        match prev, curr with
-        | { Position = p; Button0 = Pressed  }, { Position = c; Button0 = Pressed  } when p <> c -> DragTo    c
-        | { Position = p; Button0 = Released }, { Position = c; Button0 = Pressed  }             -> ClickAt   c
-        | { Position = p; Button0 = Pressed  }, { Position = c; Button0 = Released }             -> ReleaseAt c
-        | _                                   , { Position = c                     }             -> MoveTo    c
+    member x.ProcessEvent (we: WindowEvent) : 'S option =
+        failwith "not implemented"
 
-
-type WindowEvent =
-    | CursorMove    of vec2
-    | CursorPress   of int * vec2
-    | CursorRelease of int * vec2
-
-type Manager = {
+type Manager<'S, 'M> = {
     EventQueue  : Queue<WindowEvent>
+    Widgets     : Widget<'S> list
+    Model       : 'M
+    ApplySignal : 'M -> 'S -> 'M           // apply signal to old model and generate new model
+    GenerateUi  : 'M -> Widget<'S> list    // regenerate the widgets
 } with
     member x.EnqueueEvent e = { x with EventQueue = x.EventQueue.Enqueue e }
 
-    static member applyOneEvent (m: Manager) =
+    static member applyWindowEvent (m: Manager<'Ev, 'Md>) =
         let e, newEvQueue = m.EventQueue.Dequeue ()
 
         { m with EventQueue = newEvQueue }
